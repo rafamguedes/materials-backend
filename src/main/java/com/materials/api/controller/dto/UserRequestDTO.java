@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class CustomerRequestDTO {
+public class UserRequestDTO {
   @NotEmpty private String name;
   @NotEmpty @Email private String email;
   @NotEmpty private String phone;
