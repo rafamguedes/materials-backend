@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.materials.api.service.exceptions.BadRequestException;
+import com.materials.api.service.exceptions.GeneralException;
 import com.materials.api.service.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,8 @@ public class GlobalControllerAdvice {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleGeneralExceptions(Exception ex) {
+  @ExceptionHandler(GeneralException.class)
+  public ResponseEntity<String> handleGeneralExceptions(GeneralException ex) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
   }
 }
