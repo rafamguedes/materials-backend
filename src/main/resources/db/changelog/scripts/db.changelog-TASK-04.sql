@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset rafa-guedes:TASK-04 dbms:postgresql
+-- changeset rafa-guedes:TASK-01 dbms:postgresql
 
 CREATE TABLE IF NOT EXISTS tb_address (
     id BIGSERIAL PRIMARY KEY,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS tb_address (
     siafi VARCHAR(10)
 );
 
-CREATE TABLE IF NOT EXISTS tb_customer (
+CREATE TABLE IF NOT EXISTS tb_users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
