@@ -17,3 +17,18 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.yaml
+  cache:
+    type: simple
+    cache-names: reservations,reservationFilters
+    simple:
+      cache-names: reservations,reservationFilters
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,caches
+    endpoint:
+      health:
+        show-details: always
+      caches:
+        enabled: true

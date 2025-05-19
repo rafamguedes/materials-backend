@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/scripts/db.changelog-TASK-04.sql
   - include:
       file: db/changelog/scripts/db.changelog-TASK-07.sql
+  - include:
+      file: db/changelog/scripts/db.changelog-TASK-08.sql
