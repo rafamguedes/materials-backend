@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/scripts/db.changelog-TASK-08.sql
   - include:
       file: db/changelog/scripts/db.changelog-TASK-09.sql
+  - include:
+      file: db/changelog/scripts/db.changelog-TASK-10.sql

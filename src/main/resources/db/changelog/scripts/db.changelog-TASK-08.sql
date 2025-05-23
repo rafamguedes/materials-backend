@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS tb_reservation (
     item_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES tb_user(id),
+    FOREIGN KEY (user_id) REFERENCES tb_users(id),
     FOREIGN KEY (item_id) REFERENCES tb_item(id)
 );
 

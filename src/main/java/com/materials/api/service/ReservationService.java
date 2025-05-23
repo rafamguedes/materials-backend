@@ -126,7 +126,7 @@ public class ReservationService {
   public PagedDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
     var nextToken = PagedHelper.getNextTokenSeparator(
-        filter, result, ReservationDTO::getStatus, ReservationDTO::getId);
+        filter, result, ReservationDTO::getCode, ReservationDTO::getId);
 
     return new PagedDTO<>(result, nextToken);
   }
@@ -155,6 +155,7 @@ public class ReservationService {
         .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
     reservation.setStatus(ReservationStatusEnum.IN_PROGRESS);
+    reservation.setStartTime(LocalDateTime.now());
     item.setStatus(ItemStatusEnum.RESERVED);
     reservationRepository.save(reservation);
   }
@@ -169,6 +170,7 @@ public class ReservationService {
         .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
     reservation.setStatus(ReservationStatusEnum.COMPLETED);
+    reservation.setEndTime(LocalDateTime.now());
     item.setStatus(ItemStatusEnum.AVAILABLE);
     reservationRepository.save(reservation);
   }
