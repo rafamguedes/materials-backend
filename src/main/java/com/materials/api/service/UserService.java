@@ -65,7 +65,6 @@ public class UserService {
     var user = findEntityById(id);
     user.setName(requestDTO.getName());
     user.setEmail(requestDTO.getEmail());
-    user.setPhone(requestDTO.getPhone());
 
     var updatedUser = userRepository.save(user);
     return modelMapper.map(updatedUser, UserDTO.class);

@@ -25,7 +25,7 @@ public class User {
 
   private String name;
   private String email;
-  private String phone;
+  private String registry;
 
   @OneToOne(cascade = CascadeType.ALL)
   private Address address;
