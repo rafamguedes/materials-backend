@@ -23,12 +23,14 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     var nativeQuery =
         entityManager
             .createNativeQuery(
-                "SELECT r.id, r.date_time as dateTime, r.code, r.status, r.user_id as userId, r.item_id as itemId "
+                "SELECT r.id, r.date_time as dateTime, r.code, r.status, u.registry as userRegistry, i.item_type as itemType "
                     + "FROM tb_reservation r "
+                    + "INNER JOIN tb_users u ON r.user_id = u.id "
+                    + "INNER JOIN tb_item i ON r.item_id = i.id "
                     + "WHERE 1=1 "
                     + setSearchFilter(filter)
                     + setTokenFilter(filter)
-                    + "ORDER BY r.date_time "
+                    + "ORDER BY r.code "
                     + setFilterOrder(filter)
                     + ", r.id "
                     + setFilterOrder(filter),
@@ -63,7 +65,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
   private String setTokenFilter(ReservationFilterDTO filter) {
     var orderOperation = FilterOrderEnum.DESC.equals(filter.getOrder()) ? "<" : ">";
     return Objects.nonNull(filter.getNextToken())
-        ? "AND (r.date_time, r.id) " + orderOperation + " (:tokenName, :tokenId) "
+        ? "AND (r.code, r.id) " + orderOperation + " (:tokenName, :tokenId) "
         : " ";
   }
 }

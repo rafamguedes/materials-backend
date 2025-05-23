@@ -13,6 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
@@ -39,8 +41,8 @@ import java.time.LocalDateTime;
               @ColumnResult(name = "dateTime", type = LocalDateTime.class),
               @ColumnResult(name = "code", type = String.class),
               @ColumnResult(name = "status", type = String.class),
-              @ColumnResult(name = "userId", type = Long.class),
-              @ColumnResult(name = "itemId", type = Long.class)
+              @ColumnResult(name = "userRegistry", type = String.class),
+              @ColumnResult(name = "itemType", type = String.class)
             })
       })
 })
@@ -63,6 +65,12 @@ public class Reservation implements Serializable {
   @Column(name = "date_time")
   private LocalDateTime dateTime;
 
+  @Column(name = "start_time")
+  private LocalDateTime startTime;
+
+  @Column(name = "end_time")
+  private LocalDateTime endTime;
+
   @Column(name = "code")
   private String code;
 
@@ -78,12 +86,12 @@ public class Reservation implements Serializable {
   @JoinColumn(name = "item_id")
   private Item item;
 
-  @CreationTimestamp
   @Column(name = "created_at")
+  @CreationTimestamp
   private LocalDateTime createdAt;
 
-  @UpdateTimestamp
   @Column(name = "updated_at")
+  @UpdateTimestamp
   private LocalDateTime updatedAt;
 
   @Column(name = "deleted_at")

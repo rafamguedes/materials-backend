@@ -13,6 +13,6 @@ public class ReservationDTO implements Serializable {
   private LocalDateTime dateTime;
   private String status;
   private String code;
-  private Long userId;
-  private Long itemId;
+  private String userRegistry;
+  private String itemType;
 }
