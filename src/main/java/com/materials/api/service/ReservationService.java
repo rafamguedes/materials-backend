@@ -8,7 +8,7 @@ import com.materials.api.controller.dto.ReservationUpdateRequestDTO;
 import com.materials.api.entity.Reservation;
 import com.materials.api.enums.ItemStatusEnum;
 import com.materials.api.enums.ReservationStatusEnum;
-import com.materials.api.pagination.PagedHelper;
+import com.materials.api.utils.TokenHelper;
 import com.materials.api.pagination.PagedDTO;
 import com.materials.api.repository.ItemRepository;
 import com.materials.api.repository.ReservationRepository;
@@ -19,8 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -125,8 +127,15 @@ public class ReservationService {
   @Cacheable("reservationFilters")
   public PagedDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
-    var nextToken = PagedHelper.getNextTokenSeparator(
-        filter, result, ReservationDTO::getCode, ReservationDTO::getId);
+
+    String nextToken = null;
+    if (result.size() == filter.getRows()) {
+      nextToken =
+          Optional.ofNullable(CollectionUtils.lastElement(result))
+              .map(dto -> TokenHelper.generateBase32Token(
+                      dto.getId(), filter.getOrderByColumn().getColumnValue(dto)))
+              .orElse(null);
+    }
 
     return new PagedDTO<>(result, nextToken);
   }
