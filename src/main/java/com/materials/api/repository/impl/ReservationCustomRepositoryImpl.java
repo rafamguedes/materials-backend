@@ -3,7 +3,7 @@ package com.materials.api.repository.impl;
 import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.entity.Reservation;
 import com.materials.api.enums.FilterOrderEnum;
-import com.materials.api.pagination.PagedHelper;
+import com.materials.api.utils.TokenHelper;
 import com.materials.api.repository.ReservationCustomRepository;
 import com.materials.api.service.dto.ReservationDTO;
 import jakarta.persistence.EntityManager;
@@ -30,10 +30,10 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                     + "WHERE 1=1 "
                     + setSearchFilter(filter)
                     + setTokenFilter(filter)
-                    + "ORDER BY r.code "
-                    + setFilterOrder(filter)
-                    + ", r.id "
-                    + setFilterOrder(filter),
+                    + "ORDER BY " + filter.getOrderByColumn()
+                    + (FilterOrderEnum.DESC.equals(filter.getOrder())
+                        ? " DESC, r.id DESC"
+                        : " ASC, r.id ASC"),
                 Reservation.RESERVATION_DTO_MAPPING)
             .setMaxResults(filter.getRows());
 
@@ -43,29 +43,31 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
             t -> {
-              nativeQuery.setParameter("tokenName", PagedHelper.tokenToName(t));
-              nativeQuery.setParameter("tokenId", PagedHelper.tokenToId(t));
+              nativeQuery.setParameter("tokenName", TokenHelper.extractFieldFromToken(t));
+              nativeQuery.setParameter("tokenId", TokenHelper.extractIdFromToken(t));
             });
 
     return nativeQuery.getResultList();
-  }
-
-  private FilterOrderEnum setFilterOrder(ReservationFilterDTO filter) {
-    return Optional.ofNullable(filter.getOrder()).orElse(FilterOrderEnum.ASC);
   }
 
   private String setSearchFilter(ReservationFilterDTO filter) {
     return Objects.nonNull(filter.getSearch())
         ? " AND (CAST(r.id as VARCHAR) LIKE :search"
             + " OR r.code ILIKE :search"
-            + " OR r.status ILIKE :search) "
+            + " OR r.status ILIKE :search"
+            + " OR r.date_time::text ILIKE :search"
+            + " OR u.registry ILIKE :search"
+            + " OR i.item_type ILIKE :search) "
         : " ";
   }
 
   private String setTokenFilter(ReservationFilterDTO filter) {
     var orderOperation = FilterOrderEnum.DESC.equals(filter.getOrder()) ? "<" : ">";
+    var column = filter.getOrderByColumn().getColumnName();
+    var tokenName = filter.getOrderByColumn().getTokenName();
+
     return Objects.nonNull(filter.getNextToken())
-        ? "AND (r.code, r.id) " + orderOperation + " (:tokenName, :tokenId) "
+        ? "AND (" + column + ", r.id) " + orderOperation + " (" + tokenName + ", :tokenId) "
         : " ";
   }
 }
