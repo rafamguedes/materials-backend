@@ -23,13 +23,20 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     var nativeQuery =
         entityManager
             .createNativeQuery(
-                "SELECT r.id, r.date_time as dateTime, r.code, r.status, u.registry as userRegistry, i.item_type as itemType "
+                "SELECT "
+                    + "r.id, "
+                    + "r.date_time AS dateTime, "
+                    + "r.code, "
+                    + "r.status, "
+                    + "u.registry AS userRegistry, "
+                    + "i.item_type AS itemType "
                     + "FROM tb_reservation r "
                     + "INNER JOIN tb_users u ON r.user_id = u.id "
                     + "INNER JOIN tb_item i ON r.item_id = i.id "
                     + "WHERE 1=1 "
-                    + setSearchFilter(filter)
-                    + setTokenFilter(filter)
+                    + appendSearchByFilter(filter)
+                    + appendSearchByStatus(filter)
+                    + appendTokenFilter(filter)
                     + "ORDER BY " + filter.getOrderByColumn()
                     + (FilterOrderEnum.DESC.equals(filter.getOrder())
                         ? " DESC, r.id DESC"
@@ -39,6 +46,9 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
     Optional.ofNullable(filter.getSearch())
         .ifPresent(s -> nativeQuery.setParameter("search", "%" + s + "%"));
+
+    Optional.ofNullable(filter.getStatus())
+        .ifPresent(s -> nativeQuery.setParameter("status", s.name()));
 
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
@@ -50,7 +60,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     return nativeQuery.getResultList();
   }
 
-  private String setSearchFilter(ReservationFilterDTO filter) {
+  private String appendSearchByFilter(ReservationFilterDTO filter) {
     return Objects.nonNull(filter.getSearch())
         ? " AND (CAST(r.id as VARCHAR) LIKE :search"
             + " OR r.code ILIKE :search"
@@ -61,7 +71,13 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
         : " ";
   }
 
-  private String setTokenFilter(ReservationFilterDTO filter) {
+  private String appendSearchByStatus(ReservationFilterDTO filter) {
+    return Objects.nonNull(filter.getStatus())
+        ? " AND r.status LIKE CAST(:status AS VARCHAR) "
+        : " ";
+  }
+
+  private String appendTokenFilter(ReservationFilterDTO filter) {
     var orderOperation = FilterOrderEnum.DESC.equals(filter.getOrder()) ? "<" : ">";
     var column = filter.getOrderByColumn().getColumnName();
     var tokenName = filter.getOrderByColumn().getTokenName();
