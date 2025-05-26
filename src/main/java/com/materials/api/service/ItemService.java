@@ -36,6 +36,11 @@ public class ItemService {
     return modelMapper.map(item, ItemDTO.class);
   }
 
+  public Iterable<ItemDTO> getAll() {
+    var items = itemRepository.findAll();
+    return modelMapper.map(items, new org.modelmapper.TypeToken<Iterable<ItemDTO>>() {}.getType());
+  }
+
   public ItemDTO update(Long id, ItemRequestDTO requestDTO) {
     var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND));
     item.setName(requestDTO.getName());

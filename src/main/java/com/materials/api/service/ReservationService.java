@@ -8,6 +8,7 @@ import com.materials.api.controller.dto.ReservationUpdateRequestDTO;
 import com.materials.api.entity.Reservation;
 import com.materials.api.enums.ItemStatusEnum;
 import com.materials.api.enums.ReservationStatusEnum;
+import com.materials.api.service.exceptions.BadRequestException;
 import com.materials.api.utils.TokenHelper;
 import com.materials.api.pagination.PagedDTO;
 import com.materials.api.repository.ItemRepository;
@@ -17,7 +18,6 @@ import com.materials.api.service.dto.ReservationDTO;
 import com.materials.api.service.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -28,8 +28,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReservationService {
   private static final String RESERVATION_NOT_FOUND = "Reserva não encontrada";
-  private static final String USER_NOT_FOUND = "Usuário não encontrado, verifique o ID do usuário: ";
   private static final String ITEM_NOT_FOUND = "Item não encontrado, verifique o ID do item: ";
+  private static final String USER_NOT_FOUND = "Usuário não encontrado, verifique o ID do usuário: ";
+  private static final String RESERVATION_ALREADY_EXISTS =
+      "Já existe uma reserva para o horário informado: ";
+  private static final String RESERVATION_START_VALIDATE_STATUS =
+      "A reserva só pode ser iniciada se estiver com o status Pendente.";
+  public static final String RESERVATION_COMPLETE_VALIDATE_STATUS =
+      "A reserva só pode ser concluída se estiver em Andamento.";
+  public static final String RESERVATION_CANCEL_VALIDATE_STATUS =
+      "A reserva só pode ser cancelada se estiver com o status Pendente.";
 
   private final ReservationRepository reservationRepository;
   private final UserRepository userRepository;
@@ -37,10 +45,12 @@ public class ReservationService {
   private final ModelMapper modelMapper;
 
   public ReservationDTO create(ReservationRequestDTO requestDTO) {
+    validateDateTime(requestDTO);
+
     var user =
         userRepository
-            .findById(requestDTO.getUserId())
-            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND + requestDTO.getUserId()));
+            .findByRegistry(requestDTO.getUserRegistry())
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND + requestDTO.getUserRegistry()));
 
     var item =
         itemRepository
@@ -60,21 +70,35 @@ public class ReservationService {
     return modelMapper.map(savedReservation, ReservationDTO.class);
   }
 
+  private void validateDateTime(ReservationRequestDTO requestDTO) {
+    reservationRepository
+        .findByDateTime(requestDTO.getDateTime())
+        .ifPresent(
+            reservation -> {
+              throw new BadRequestException(
+                  RESERVATION_ALREADY_EXISTS + requestDTO.getDateTime());
+            });
+  }
+
   public void update(Long id, ReservationUpdateRequestDTO requestDTO) {
     var reservation =
         reservationRepository
             .findById(id)
             .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_FOUND));
 
-    var item =
-        itemRepository
-            .findById(requestDTO.getItemId())
-            .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + requestDTO.getItemId()));
+    Optional.ofNullable(requestDTO.getItemId())
+        .ifPresent(
+            itemId -> {
+              var item =
+                  itemRepository
+                      .findById(itemId)
+                      .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + itemId));
+              reservation.setItem(item);
+            });
 
-    reservation.setDateTime(requestDTO.getDateTime());
-    reservation.setItem(item);
+    Optional.ofNullable(requestDTO.getDateTime()).ifPresent(reservation::setDateTime);
 
-    reservationRepository.save(reservation);
+    reservationRepository.saveAndFlush(reservation);
   }
 
   public void hardDelete(Long id) {
@@ -124,7 +148,6 @@ public class ReservationService {
     return modelMapper.map(reservation, ReservationDTO.class);
   }
 
-  @Cacheable("reservationFilters")
   public PagedDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
 
@@ -140,28 +163,42 @@ public class ReservationService {
     return new PagedDTO<>(result, nextToken);
   }
 
-  public void cancel(Long id) {
+  public void cancel(String code) {
     var reservation =
         reservationRepository
-            .findById(id)
+            .findByCode(code.trim())
             .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_FOUND));
 
-    var item = itemRepository.findById(reservation.getItem().getId())
-        .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
+    if (!ReservationStatusEnum.PENDING.equals(reservation.getStatus())) {
+        throw new BadRequestException(RESERVATION_CANCEL_VALIDATE_STATUS);
+    }
+
+    var item =
+        itemRepository
+            .findById(reservation.getItem().getId())
+            .orElseThrow(
+                () -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
     reservation.setStatus(ReservationStatusEnum.CANCELED);
     item.setStatus(ItemStatusEnum.AVAILABLE);
     reservationRepository.save(reservation);
   }
 
-  public void start(Long id) {
+  public void start(String code) {
     var reservation =
         reservationRepository
-            .findById(id)
+            .findByCode(code)
             .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_FOUND));
 
-    var item = itemRepository.findById(reservation.getItem().getId())
-        .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
+    if (!ReservationStatusEnum.PENDING.equals(reservation.getStatus())) {
+      throw new BadRequestException(RESERVATION_START_VALIDATE_STATUS);
+    }
+
+    var item =
+        itemRepository
+            .findById(reservation.getItem().getId())
+            .orElseThrow(
+                () -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
     reservation.setStatus(ReservationStatusEnum.IN_PROGRESS);
     reservation.setStartTime(LocalDateTime.now());
@@ -169,14 +206,21 @@ public class ReservationService {
     reservationRepository.save(reservation);
   }
 
-  public void complete(Long id) {
+  public void complete(String code) {
     var reservation =
         reservationRepository
-            .findById(id)
+            .findByCode(code)
             .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_FOUND));
 
-    var item = itemRepository.findById(reservation.getItem().getId())
-        .orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
+    if (!ReservationStatusEnum.IN_PROGRESS.equals(reservation.getStatus())) {
+        throw new BadRequestException(RESERVATION_COMPLETE_VALIDATE_STATUS);
+    }
+
+    var item =
+        itemRepository
+            .findById(reservation.getItem().getId())
+            .orElseThrow(
+                () -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
     reservation.setStatus(ReservationStatusEnum.COMPLETED);
     reservation.setEndTime(LocalDateTime.now());

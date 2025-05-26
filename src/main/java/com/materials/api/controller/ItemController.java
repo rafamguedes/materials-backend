@@ -34,6 +34,12 @@ public class ItemController {
     return ResponseEntity.ok(item);
   }
 
+  @GetMapping
+  public ResponseEntity<Iterable<ItemDTO>> getAll() {
+    var items = itemService.getAll();
+    return ResponseEntity.ok(items);
+  }
+
   @PutMapping("/{id}")
   public ResponseEntity<ItemDTO> update(
       @PathVariable Long id, @Valid @RequestBody ItemRequestDTO itemRequestDTO) {
