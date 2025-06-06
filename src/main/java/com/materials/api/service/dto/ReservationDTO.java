@@ -15,4 +15,6 @@ public class ReservationDTO implements Serializable {
   private String code;
   private String userRegistry;
   private String itemType;
+  private String itemName;
+  private String itemDescription;
 }

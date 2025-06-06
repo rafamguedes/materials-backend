@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,7 +27,7 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @PostMapping
-  public ResponseEntity<ReservationDTO> create(
+  public ResponseEntity<ReservationDTO> createByUser(
       @Valid @RequestBody ReservationRequestDTO requestDTO) {
     var response = reservationService.create(requestDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -75,21 +76,21 @@ public class ReservationController {
     return ResponseEntity.noContent().build();
   }
 
-  @PutMapping("/cancel/{id}")
-  public ResponseEntity<Void> cancel(@PathVariable Long id) {
-    reservationService.cancel(id);
+  @PatchMapping("/cancel/{code}")
+  public ResponseEntity<Void> cancel(@PathVariable String code) {
+    reservationService.cancel(code);
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/start/{id}")
-  public ResponseEntity<Void> start(@PathVariable Long id) {
-    reservationService.start(id);
+  @PatchMapping("/start/{code}")
+  public ResponseEntity<Void> start(@PathVariable String code) {
+    reservationService.start(code);
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/complete/{id}")
-  public ResponseEntity<Void> complete(@PathVariable Long id) {
-    reservationService.complete(id);
+  @PatchMapping("/complete/{code}")
+  public ResponseEntity<Void> complete(@PathVariable String code) {
+    reservationService.complete(code);
     return ResponseEntity.ok().build();
   }
 }
