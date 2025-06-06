@@ -1,6 +1,8 @@
 package com.materials.api.controller;
 
+import com.materials.api.controller.dto.ItemFilterDTO;
 import com.materials.api.controller.dto.ItemRequestDTO;
+import com.materials.api.pagination.PagedDTO;
 import com.materials.api.service.ItemService;
 import com.materials.api.service.dto.ItemDTO;
 import jakarta.validation.Valid;
@@ -32,6 +34,12 @@ public class ItemController {
   public ResponseEntity<ItemDTO> getById(@PathVariable Long id) {
     var item = itemService.getById(id);
     return ResponseEntity.ok(item);
+  }
+
+  @GetMapping
+  public ResponseEntity<PagedDTO<ItemDTO>> findByFilter(@Valid ItemFilterDTO filter) {
+    var items = itemService.findByFilter(filter);
+    return ResponseEntity.ok(items);
   }
 
   @PutMapping("/{id}")

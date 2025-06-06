@@ -124,7 +124,6 @@ public class ReservationService {
     return modelMapper.map(reservation, ReservationDTO.class);
   }
 
-  @Cacheable("reservationFilters")
   public PagedDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
 
