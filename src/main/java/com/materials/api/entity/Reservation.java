@@ -43,7 +43,7 @@ import java.time.LocalDateTime;
               @ColumnResult(name = "createdAt", type = LocalDateTime.class),
               @ColumnResult(name = "userRegistry", type = String.class),
               @ColumnResult(name = "itemId", type = Long.class),
-              @ColumnResult(name = "itemType", type = String.class)
+              @ColumnResult(name = "itemType", type = String.class),
             })
       })
 })
@@ -60,7 +60,7 @@ public class Reservation implements Serializable {
   public static final String RESERVATION_DTO_MAPPING = "ReservationDTO";
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
 
   @Column(name = "date_time")
