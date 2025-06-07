@@ -13,8 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
@@ -23,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
@@ -39,9 +36,13 @@ import java.time.LocalDateTime;
             columns = {
               @ColumnResult(name = "id", type = Long.class),
               @ColumnResult(name = "dateTime", type = LocalDateTime.class),
+              @ColumnResult(name = "startTime", type = LocalDateTime.class),
+              @ColumnResult(name = "endTime", type = LocalDateTime.class),
               @ColumnResult(name = "code", type = String.class),
               @ColumnResult(name = "status", type = String.class),
+              @ColumnResult(name = "createdAt", type = LocalDateTime.class),
               @ColumnResult(name = "userRegistry", type = String.class),
+              @ColumnResult(name = "itemId", type = Long.class),
               @ColumnResult(name = "itemType", type = String.class)
             })
       })

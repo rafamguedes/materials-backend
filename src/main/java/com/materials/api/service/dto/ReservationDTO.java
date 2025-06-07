@@ -11,8 +11,12 @@ import java.time.LocalDateTime;
 public class ReservationDTO implements Serializable {
   private Long id;
   private LocalDateTime dateTime;
-  private String status;
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
   private String code;
+  private String status;
+  private LocalDateTime createdAt;
   private String userRegistry;
+  private Long itemId;
   private String itemType;
 }
