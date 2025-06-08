@@ -73,6 +73,10 @@ public class ItemService {
 
   public void delete(Long id) {
     var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND));
-    itemRepository.delete(item);
+    try {
+      itemRepository.delete(item);
+    } catch (org.springframework.dao.DataIntegrityViolationException e) {
+      throw new GeneralException("Não é possível deletar um equipamento que esteja vinculado a uma reserva.");
+    }
   }
 }

@@ -224,7 +224,9 @@ public class ReservationService {
 
     reservation.setStatus(ReservationStatusEnum.COMPLETED);
     reservation.setEndTime(LocalDateTime.now());
+    reservation.setItem(null);
     item.setStatus(ItemStatusEnum.AVAILABLE);
+
     reservationRepository.save(reservation);
   }
 }

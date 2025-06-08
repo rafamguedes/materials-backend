@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/scripts/db.changelog-TASK-10.sql
   - include:
       file: db/changelog/scripts/db.changelog-TASK-11.sql
+  - include:
+      file: db/changelog/scripts/db.changelog-TASK-18.sql
