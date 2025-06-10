@@ -4,14 +4,12 @@ import static com.materials.api.utils.GenerateSerialNumber.generateSerialNumber;
 
 import com.materials.api.controller.dto.ItemFilterDTO;
 import com.materials.api.controller.dto.ItemRequestDTO;
-import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.entity.Item;
 import com.materials.api.enums.ItemStatusEnum;
-import com.materials.api.pagination.PagedDTO;
+import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.ItemRepository;
 import com.materials.api.service.dto.ItemDTO;
 
-import com.materials.api.service.dto.ReservationDTO;
 import com.materials.api.service.exceptions.GeneralException;
 import com.materials.api.service.exceptions.NotFoundException;
 import com.materials.api.utils.TokenHelper;
@@ -44,7 +42,7 @@ public class ItemService {
     return modelMapper.map(item, ItemDTO.class);
   }
 
-  public PagedDTO<ItemDTO> findByFilter(ItemFilterDTO filter) {
+  public PaginationDTO<ItemDTO> findByFilter(ItemFilterDTO filter) {
     var result = itemRepository.findByFilter(filter);
 
     String nextToken = null;
@@ -58,7 +56,7 @@ public class ItemService {
               .orElse(null);
     }
 
-    return new PagedDTO<>(result, nextToken);
+    return new PaginationDTO<>(result, nextToken);
   }
 
   public ItemDTO update(Long id, ItemRequestDTO requestDTO) {

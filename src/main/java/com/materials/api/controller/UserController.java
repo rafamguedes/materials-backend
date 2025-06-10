@@ -1,6 +1,8 @@
 package com.materials.api.controller;
 
+import com.materials.api.controller.dto.UserFilterDTO;
 import com.materials.api.controller.dto.UserRequestDTO;
+import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.service.UserService;
 import com.materials.api.service.dto.UserDTO;
 import jakarta.validation.Valid;
@@ -26,6 +28,12 @@ public class UserController {
   public ResponseEntity<UserDTO> create(@Valid @RequestBody UserRequestDTO requestDTO) {
     var response = userService.create(requestDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  @GetMapping
+  public ResponseEntity<PaginationDTO<UserDTO>> findByFilter(@Valid UserFilterDTO filter) {
+    var response = userService.findByFilter(filter);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")

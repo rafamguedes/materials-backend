@@ -1,17 +1,22 @@
 package com.materials.api.service;
 
+import com.materials.api.controller.dto.UserFilterDTO;
 import com.materials.api.controller.dto.UserRequestDTO;
 import com.materials.api.entity.User;
+import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.UserRepository;
 import com.materials.api.service.dto.UserDTO;
 import com.materials.api.service.exceptions.BadRequestException;
 import com.materials.api.service.exceptions.NotFoundException;
 import com.materials.api.service.rest.PostalCodeRestService;
+import com.materials.api.utils.TokenHelper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +53,22 @@ public class UserService {
     user.setAddress(address);
     var savedUser = userRepository.save(user);
     return modelMapper.map(savedUser, UserDTO.class);
+  }
+
+  public PaginationDTO<UserDTO> findByFilter(UserFilterDTO filter) {
+    var result = userRepository.findByFilter(filter);
+
+    String nextToken =
+        (result.size() == filter.getRows())
+            ? Optional.ofNullable(CollectionUtils.lastElement(result))
+                .map(
+                    dto ->
+                        TokenHelper.generateBase32Token(
+                            dto.getId(), filter.getOrderByColumn().getColumnValue(dto)))
+                .orElse(null)
+            : null;
+
+    return new PaginationDTO<>(result, nextToken);
   }
 
   public UserDTO getById(Long id) {

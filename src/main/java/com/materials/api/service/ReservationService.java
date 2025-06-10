@@ -10,7 +10,7 @@ import com.materials.api.enums.ItemStatusEnum;
 import com.materials.api.enums.ReservationStatusEnum;
 import com.materials.api.service.exceptions.BadRequestException;
 import com.materials.api.utils.TokenHelper;
-import com.materials.api.pagination.PagedDTO;
+import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.ItemRepository;
 import com.materials.api.repository.ReservationRepository;
 import com.materials.api.repository.UserRepository;
@@ -148,7 +148,7 @@ public class ReservationService {
     return modelMapper.map(reservation, ReservationDTO.class);
   }
 
-  public PagedDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
+  public PaginationDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
 
     String nextToken = null;
@@ -160,7 +160,7 @@ public class ReservationService {
               .orElse(null);
     }
 
-    return new PagedDTO<>(result, nextToken);
+    return new PaginationDTO<>(result, nextToken);
   }
 
   public void cancel(String code) {

@@ -2,7 +2,7 @@ package com.materials.api.controller;
 
 import com.materials.api.controller.dto.ItemFilterDTO;
 import com.materials.api.controller.dto.ItemRequestDTO;
-import com.materials.api.pagination.PagedDTO;
+import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.service.ItemService;
 import com.materials.api.service.dto.ItemDTO;
 import jakarta.validation.Valid;
@@ -37,7 +37,7 @@ public class ItemController {
   }
 
   @GetMapping
-  public ResponseEntity<PagedDTO<ItemDTO>> findByFilter(@Valid ItemFilterDTO filter) {
+  public ResponseEntity<PaginationDTO<ItemDTO>> findByFilter(@Valid ItemFilterDTO filter) {
     var items = itemService.findByFilter(filter);
     return ResponseEntity.ok(items);
   }
