@@ -3,7 +3,7 @@ package com.materials.api.controller;
 import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.controller.dto.ReservationRequestDTO;
 import com.materials.api.controller.dto.ReservationUpdateRequestDTO;
-import com.materials.api.pagination.PagedDTO;
+import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.service.ReservationService;
 import com.materials.api.service.dto.ReservationDTO;
 import jakarta.validation.Valid;
@@ -46,7 +46,7 @@ public class ReservationController {
   }
 
   @GetMapping
-  public ResponseEntity<PagedDTO<ReservationDTO>> getByFilter(ReservationFilterDTO filterDTO) {
+  public ResponseEntity<PaginationDTO<ReservationDTO>> getByFilter(ReservationFilterDTO filterDTO) {
     var response = reservationService.getByFilter(filterDTO);
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }

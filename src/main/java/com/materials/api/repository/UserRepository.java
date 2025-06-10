@@ -8,7 +8,7 @@ import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserCustomRepository {
   boolean existsByEmail(String email);
 
   Optional<User> findByRegistry(String registry);

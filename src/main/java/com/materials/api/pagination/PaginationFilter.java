@@ -9,7 +9,7 @@ import java.util.Optional;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class PagedFilter {
+public abstract class PaginationFilter {
   private String nextToken;
   private Integer rows;
 

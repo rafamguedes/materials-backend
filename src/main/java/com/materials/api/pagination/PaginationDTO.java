@@ -8,8 +8,9 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class PagedListDTO<T extends Serializable> {
+@AllArgsConstructor
+public class PaginationDTO<T extends Serializable> {
   private List<T> data;
+  private String nextToken;
 }
