@@ -68,6 +68,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         ? " AND (CAST(u.id as VARCHAR) LIKE :search"
             + " OR u.name ILIKE :search"
             + " OR u.registry ILIKE :search"
+            + " OR u.email ILIKE :search) "
         : " ";
   }
 
