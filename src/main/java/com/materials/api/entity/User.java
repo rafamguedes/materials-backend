@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
               @ColumnResult(name = "name", type = String.class),
               @ColumnResult(name = "email", type = String.class),
               @ColumnResult(name = "registry", type = String.class),
+              @ColumnResult(name = "active", type = Boolean.class),
               @ColumnResult(name = "createdAt", type = LocalDateTime.class),
               @ColumnResult(name = "updatedAt", type = LocalDateTime.class),
               @ColumnResult(name = "deletedAt", type = LocalDateTime.class),

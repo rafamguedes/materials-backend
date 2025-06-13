@@ -38,6 +38,7 @@ public class UserService {
       return createWithAddress(requestDTO);
     } else {
       var user = modelMapper.map(requestDTO, User.class);
+      user.setActive(Boolean.TRUE);
       var savedUser = userRepository.save(user);
       return modelMapper.map(savedUser, UserDTO.class);
     }
@@ -51,6 +52,7 @@ public class UserService {
 
     var user = modelMapper.map(requestDTO, User.class);
     user.setAddress(address);
+    user.setActive(Boolean.TRUE);
     var savedUser = userRepository.save(user);
     return modelMapper.map(savedUser, UserDTO.class);
   }
@@ -86,6 +88,8 @@ public class UserService {
     var user = findEntityById(id);
     user.setName(requestDTO.getName());
     user.setEmail(requestDTO.getEmail());
+    user.setRegistry(requestDTO.getRegistry());
+    user.setActive(requestDTO.getActive());
 
     var updatedUser = userRepository.save(user);
     return modelMapper.map(updatedUser, UserDTO.class);

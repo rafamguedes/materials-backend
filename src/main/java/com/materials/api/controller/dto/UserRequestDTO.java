@@ -17,6 +17,8 @@ public class UserRequestDTO {
   @NotEmpty
   private String registry;
 
+  private Boolean active;
+
   @Pattern(regexp = "^\\d{5}-?\\d{3}$", message = "CEP deve estar no formato XXXXX-XXX ou XXXXXXXX")
   private String postalCode;
 }
