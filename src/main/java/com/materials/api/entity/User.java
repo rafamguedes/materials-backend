@@ -8,6 +8,8 @@ import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
@@ -76,4 +78,17 @@ public class User extends GenericEntity {
 
   @OneToOne(cascade = CascadeType.ALL)
   private Address address;
+
+  @PrePersist
+  protected void onCreate() {
+    this.active = Boolean.TRUE;
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+    this.isDeleted = Boolean.FALSE;
+  }
+
+  @PreUpdate
+  protected void onUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
 }
