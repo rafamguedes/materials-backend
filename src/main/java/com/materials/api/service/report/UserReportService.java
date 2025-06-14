@@ -1,9 +1,8 @@
-package com.materials.api.service;
+package com.materials.api.service.report;
 
 import com.materials.api.controller.dto.UserReportFilterDTO;
 import com.materials.api.entity.User;
 import com.materials.api.repository.UserRepository;
-import com.materials.api.service.report.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

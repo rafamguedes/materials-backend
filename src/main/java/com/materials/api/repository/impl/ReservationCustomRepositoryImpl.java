@@ -1,8 +1,10 @@
 package com.materials.api.repository.impl;
 
 import com.materials.api.controller.dto.ReservationFilterDTO;
+import com.materials.api.controller.dto.ReservationReportFilterDTO;
 import com.materials.api.entity.Reservation;
 import com.materials.api.enums.FilterOrderEnum;
+import com.materials.api.enums.ReservationStatusEnum;
 import com.materials.api.utils.TokenHelper;
 import com.materials.api.repository.ReservationCustomRepository;
 import com.materials.api.service.dto.ReservationDTO;
@@ -89,5 +91,26 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     return Objects.nonNull(filter.getNextToken())
         ? "AND (" + column + ", r.id) " + orderOperation + " (" + tokenName + ", :tokenId) "
         : " ";
+  }
+
+  @Override
+  public List<Reservation> findCancelledReservations(ReservationReportFilterDTO filter) {
+    var sql =
+        "SELECT r.* "
+            + "FROM tb_reservation r "
+            + "WHERE 1=1 "
+            + "AND r.status in (:status) "
+            + "AND r.date_time BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') "
+            + "ORDER BY r.id " + Optional.ofNullable(filter.getOrderBy()).orElse(FilterOrderEnum.DESC);
+
+    var query = entityManager.createNativeQuery(sql, Reservation.class);
+    query.setParameter("startDate", filter.getStartDate());
+    query.setParameter("endDate", filter.getEndDate());
+
+    Optional.ofNullable(filter.getStatus())
+        .ifPresentOrElse(status -> query.setParameter("status", status.stream().map(ReservationStatusEnum::name).toList()),
+            () -> query.setParameter("status", "PENDING"));
+
+    return query.getResultList();
   }
 }
