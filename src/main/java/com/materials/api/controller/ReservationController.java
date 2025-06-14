@@ -64,13 +64,13 @@ public class ReservationController {
     return ResponseEntity.noContent().build();
   }
 
-  @DeleteMapping("/soft-delete/{id}")
+  @DeleteMapping("/soft-softDelete/{id}")
   public ResponseEntity<Void> softDelete(@PathVariable Long id) {
     reservationService.softDelete(id);
     return ResponseEntity.noContent().build();
   }
 
-  @DeleteMapping("/recover-delete/{id}")
+  @DeleteMapping("/recover-softDelete/{id}")
   public ResponseEntity<Void> recover(@PathVariable Long id) {
     reservationService.recoverDelete(id);
     return ResponseEntity.noContent().build();

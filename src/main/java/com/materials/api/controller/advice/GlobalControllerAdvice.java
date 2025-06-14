@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.materials.api.service.exceptions.BadRequestException;
+import com.materials.api.service.exceptions.ConflictException;
 import com.materials.api.service.exceptions.GeneralException;
 import com.materials.api.service.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -37,5 +38,10 @@ public class GlobalControllerAdvice {
   @ExceptionHandler(GeneralException.class)
   public ResponseEntity<String> handleGeneralExceptions(GeneralException ex) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<String> handleConflictException(ConflictException e) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
   }
 }
