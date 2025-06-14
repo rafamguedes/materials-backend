@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <title>Relatório de Reservas</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Reservas</h1>
+    <p th:text="'Total de Reservas: ' + ${#lists.size(reservations)}"></p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Data e Hora</th>
+                <th>Código</th>
+                <th>Status</th>
+                <th>Usuário</th>
+                <th>Item</th>
+                <th>Data de Criação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="reservation : ${reservations}">
+                <td th:text="${reservation.id != null ? reservation.id : ''}"></td>
+                <td th:text="${reservation.dateTime != null ? #temporals.format(reservation.dateTime, 'dd/MM/yyyy HH:mm') : ''}"></td>
+                <td th:text="${reservation.code != null ? reservation.code : ''}"></td>
+                <td th:text="${reservation.status != null ? reservation.status : ''}"></td>
+                <td th:text="${reservation.user != null && reservation.user.registry != null ? reservation.user.registry : ''}"></td>
+                <td th:text="${reservation.item != null && reservation.item.name != null ? reservation.item.name : ''}"></td>
+                <td th:text="${reservation.createdAt != null ? #temporals.format(reservation.createdAt, 'dd/MM/yyyy HH:mm') : ''}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
