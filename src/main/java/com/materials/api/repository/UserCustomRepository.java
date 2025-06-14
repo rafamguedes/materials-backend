@@ -1,6 +1,7 @@
 package com.materials.api.repository;
 
 import com.materials.api.controller.dto.UserFilterDTO;
+import com.materials.api.controller.dto.UserReportFilterDTO;
 import com.materials.api.entity.User;
 
 import java.util.List;
