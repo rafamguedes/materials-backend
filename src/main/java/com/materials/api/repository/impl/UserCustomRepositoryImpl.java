@@ -82,4 +82,19 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
         ? "AND (" + column + ", u.id) " + orderOperation + " (" + tokenName + ", :tokenId) "
         : " ";
   }
+
+  @Override
+  public List<User> findInactiveUsers(UserReportFilterDTO filter) {
+    var sql =
+        "SELECT u "
+            + "FROM User u "
+            + "WHERE u.active = false "
+            + "AND u.createdAt BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') ";
+
+    var query = entityManager.createQuery(sql, User.class);
+    query.setParameter("startDate", filter.getStartDate());
+    query.setParameter("endDate", filter.getEndDate());
+
+    return query.getResultList();
+  }
 }

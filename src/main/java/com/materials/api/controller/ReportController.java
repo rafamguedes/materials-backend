@@ -1,7 +1,7 @@
 package com.materials.api.controller;
 
 import com.materials.api.controller.dto.UserReportFilterDTO;
-import com.materials.api.service.ReportService;
+import com.materials.api.service.UserReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reports")
+@RequestMapping("/api/v1/report")
 public class ReportController {
 
-  private final ReportService reportService;
+  private final UserReportService userReportService;
 
   @GetMapping("/inactive-users")
-  public ResponseEntity<byte[]> getInactiveUsersReport() {
-    byte[] pdf = reportService.generateInactiveUsersReport();
+  public ResponseEntity<byte[]> getInactiveUsersReport(UserReportFilterDTO filter) {
+    byte[] pdf = userReportService.generateInactiveUsersReport(filter);
 
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=inactive_users_report.pdf")
