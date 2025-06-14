@@ -3,7 +3,7 @@ package com.materials.api.service;
 import com.materials.api.controller.dto.UserReportFilterDTO;
 import com.materials.api.entity.User;
 import com.materials.api.repository.UserRepository;
-import com.materials.api.service.dto.UserDTO;
+import com.materials.api.service.report.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +12,18 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class ReportService {
+public class UserReportService {
 
   private final UserRepository userRepository;
-  private final PdfReportService pdfReportService;
+  private final ReportService reportService;
 
-  public byte[] generateInactiveUsersReport() {
-    List<User> inactiveUsers = userRepository.findByActiveFalse();
+  public byte[] generateInactiveUsersReport(UserReportFilterDTO filter) {
+    List<User> inactiveUsers = userRepository.findInactiveUsers(filter);
     if (inactiveUsers.isEmpty()) {
-        throw new RuntimeException("Nenhum usuário inativo encontrado.");
+        List.of();
     }
     Map<String, Object> data = Map.of("users", inactiveUsers);
 
-    return pdfReportService.generatePdf("reports/inactive_users_report", data);
+    return reportService.generateReport("reports/inactive_users_report", data);
   }
 }
