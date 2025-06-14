@@ -1,6 +1,7 @@
 package com.materials.api.repository.impl;
 
 import com.materials.api.controller.dto.UserFilterDTO;
+import com.materials.api.controller.dto.UserReportFilterDTO;
 import com.materials.api.entity.User;
 import com.materials.api.enums.FilterOrderEnum;
 import com.materials.api.enums.OrderByColumnUserEnum;
