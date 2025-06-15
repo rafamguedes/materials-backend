@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <title>Relatório de Itens</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Itens</h1>
+    <p th:text="'Total de itens encontrados: ' + ${#lists.size(items)}"></p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th>Nº de Série</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.id != null ? item.id : ''}"></td>
+                <td th:text="${item.name != null ? item.name : ''}"></td>
+                <td th:text="${item.description != null ? item.description : ''}"></td>
+                <td th:text="${item.type != null ? item.type : ''}"></td>
+                <td th:text="${item.serialNumber != null ? item.serialNumber : ''}"></td>
+                <td th:text="${item.status != null ? item.status : ''}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

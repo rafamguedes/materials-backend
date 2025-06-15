@@ -1,7 +1,9 @@
 package com.materials.api.controller;
 
+import com.materials.api.controller.dto.ItemReportFilterDTO;
 import com.materials.api.controller.dto.ReservationReportFilterDTO;
 import com.materials.api.controller.dto.UserReportFilterDTO;
+import com.materials.api.service.reports.ItemReportService;
 import com.materials.api.service.reports.ReservationReportService;
 import com.materials.api.service.reports.UserReportService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class ReportController {
 
   private final UserReportService userReportService;
   private final ReservationReportService reservationReportService;
+  private final ItemReportService itemReportService;
 
   @GetMapping("/users")
   public ResponseEntity<byte[]> getUsersReport(UserReportFilterDTO filter) {
@@ -36,4 +39,13 @@ public class ReportController {
         .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
         .body(pdf);
   }
+
+  @GetMapping("/items")
+    public ResponseEntity<byte[]> getItemsReport(ItemReportFilterDTO filter) {
+        byte[] pdf = itemReportService.generateItemReport(filter);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=items_report.pdf")
+            .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+            .body(pdf);
+    }
 }
