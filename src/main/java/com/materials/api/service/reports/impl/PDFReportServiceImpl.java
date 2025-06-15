@@ -1,6 +1,6 @@
-package com.materials.api.service.report.impl;
+package com.materials.api.service.reports.impl;
 
-    import com.materials.api.service.report.ReportService;
+    import com.materials.api.service.reports.ReportService;
     import lombok.RequiredArgsConstructor;
     import org.springframework.stereotype.Service;
     import org.thymeleaf.TemplateEngine;
@@ -33,7 +33,7 @@ package com.materials.api.service.report.impl;
 
           return outputStream.toByteArray();
         } catch (Exception e) {
-          throw new RuntimeException("Error generating report PDF.", e);
+          throw new RuntimeException("Error generating reports PDF.", e);
         }
       }
     }

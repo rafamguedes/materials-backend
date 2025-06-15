@@ -11,5 +11,5 @@ import com.materials.api.service.dto.UserDTO;
 public interface UserCustomRepository {
   List<UserDTO> findByFilter(UserFilterDTO filter);
 
-  List<User> findInactiveUsers(UserReportFilterDTO filter);
+  List<User> generateUsersReport(UserReportFilterDTO filter);
 }

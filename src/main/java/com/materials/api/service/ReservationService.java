@@ -1,6 +1,7 @@
 package com.materials.api.service;
 
 import static com.materials.api.utils.GenerateCode.generateCode;
+import static com.materials.api.utils.TokenUtils.getNextToken;
 
 import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.controller.dto.ReservationRequestDTO;
@@ -9,7 +10,6 @@ import com.materials.api.entity.Reservation;
 import com.materials.api.enums.ItemStatusEnum;
 import com.materials.api.enums.ReservationStatusEnum;
 import com.materials.api.service.exceptions.BadRequestException;
-import com.materials.api.utils.TokenHelper;
 import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.ItemRepository;
 import com.materials.api.repository.ReservationRepository;
@@ -19,7 +19,6 @@ import com.materials.api.service.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -150,15 +149,12 @@ public class ReservationService {
 
   public PaginationDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
-
-    String nextToken = null;
-    if (result.size() == filter.getRows()) {
-      nextToken =
-          Optional.ofNullable(CollectionUtils.lastElement(result))
-              .map(dto -> TokenHelper.generateBase32Token(
-                      dto.getId(), filter.getOrderByColumn().getColumnValue(dto)))
-              .orElse(null);
-    }
+    var nextToken =
+        getNextToken(
+            result,
+            filter.getRows(),
+            ReservationDTO::getId,
+            reservation -> filter.getOrderByColumn().getColumnValue(reservation));
 
     return new PaginationDTO<>(result, nextToken);
   }

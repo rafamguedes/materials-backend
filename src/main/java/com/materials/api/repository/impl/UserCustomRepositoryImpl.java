@@ -7,7 +7,7 @@ import com.materials.api.enums.FilterOrderEnum;
 import com.materials.api.enums.OrderByColumnUserEnum;
 import com.materials.api.repository.UserCustomRepository;
 import com.materials.api.service.dto.UserDTO;
-import com.materials.api.utils.TokenHelper;
+import com.materials.api.utils.TokenUtils;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Objects;
@@ -57,8 +57,8 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
             t -> {
-              nativeQuery.setParameter("tokenName", TokenHelper.extractFieldFromToken(t));
-              nativeQuery.setParameter("tokenId", TokenHelper.extractIdFromToken(t));
+              nativeQuery.setParameter("tokenName", TokenUtils.getTokenName(t));
+              nativeQuery.setParameter("tokenId", TokenUtils.getTokenId(t));
             });
 
     return nativeQuery.getResultList();
@@ -84,16 +84,22 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
   }
 
   @Override
-  public List<User> findInactiveUsers(UserReportFilterDTO filter) {
+  public List<User> generateUsersReport(UserReportFilterDTO filter) {
     var sql =
         "SELECT u "
             + "FROM User u "
-            + "WHERE u.active = false "
-            + "AND u.createdAt BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') ";
+            + "WHERE 1=1 "
+            + "AND u.active = :active "
+            + "AND u.createdAt BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') "
+            + "ORDER BY u.id " + Optional.ofNullable(filter.getOrderBy()).orElse(FilterOrderEnum.DESC);
 
     var query = entityManager.createQuery(sql, User.class);
     query.setParameter("startDate", filter.getStartDate());
     query.setParameter("endDate", filter.getEndDate());
+
+    Optional.ofNullable(filter.getActive())
+        .ifPresentOrElse(active -> query.setParameter("active", active),
+            () -> query.setParameter("active", Boolean.TRUE));
 
     return query.getResultList();
   }

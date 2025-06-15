@@ -5,7 +5,7 @@ import com.materials.api.controller.dto.ReservationReportFilterDTO;
 import com.materials.api.entity.Reservation;
 import com.materials.api.enums.FilterOrderEnum;
 import com.materials.api.enums.ReservationStatusEnum;
-import com.materials.api.utils.TokenHelper;
+import com.materials.api.utils.TokenUtils;
 import com.materials.api.repository.ReservationCustomRepository;
 import com.materials.api.service.dto.ReservationDTO;
 import jakarta.persistence.EntityManager;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")
@@ -59,8 +60,8 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
             t -> {
-              nativeQuery.setParameter("tokenName", TokenHelper.extractFieldFromToken(t));
-              nativeQuery.setParameter("tokenId", TokenHelper.extractIdFromToken(t));
+              nativeQuery.setParameter("tokenName", TokenUtils.getTokenName(t));
+              nativeQuery.setParameter("tokenId", TokenUtils.getTokenId(t));
             });
 
     return nativeQuery.getResultList();
@@ -94,7 +95,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
   }
 
   @Override
-  public List<Reservation> findCancelledReservations(ReservationReportFilterDTO filter) {
+  public List<Reservation> generateReservationReport(ReservationReportFilterDTO filter) {
     var sql =
         "SELECT r.* "
             + "FROM tb_reservation r "
@@ -109,7 +110,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
     Optional.ofNullable(filter.getStatus())
         .ifPresentOrElse(status -> query.setParameter("status", status.stream().map(ReservationStatusEnum::name).toList()),
-            () -> query.setParameter("status", "PENDING"));
+            () -> query.setParameter("status", Stream.of(ReservationStatusEnum.values()).map(ReservationStatusEnum::name).toList()));
 
     return query.getResultList();
   }
