@@ -1,4 +1,4 @@
-package com.materials.api.service.report;
+package com.materials.api.service.reports;
 
 import com.materials.api.controller.dto.ReservationReportFilterDTO;
 import com.materials.api.entity.Reservation;
@@ -16,8 +16,8 @@ public class ReservationReportService {
   private final ReservationRepository reservationRepository;
   private final ReportService reportService;
 
-  public byte[] generateCancelledReservationsReport(ReservationReportFilterDTO filter) {
-    List<Reservation> reservationList = reservationRepository.findCancelledReservations(filter);
+  public byte[] generateReservationReport(ReservationReportFilterDTO filter) {
+    List<Reservation> reservationList = reservationRepository.generateReservationReport(filter);
     if (reservationList.isEmpty()) {
         List.of();
     }

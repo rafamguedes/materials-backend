@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
-    <title>Relatório de Usuários Inativos</title>
+    <title>Relatório de Usuários</title>
     <style>
         table {
             width: 100%;
@@ -18,8 +18,8 @@
     </style>
 </head>
 <body>
-    <h1>Relatório de Usuários Inativos</h1>
-    <p th:text="'Total de Usuários Inativos: ' + ${#lists.size(users)}"></p>
+    <h1>Relatório de Usuários</h1>
+    <p th:text="'Total de usuários encontrados: ' + ${#lists.size(users)}"></p>
     <table>
         <thead>
             <tr>

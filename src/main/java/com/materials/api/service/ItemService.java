@@ -1,6 +1,7 @@
 package com.materials.api.service;
 
 import static com.materials.api.utils.GenerateSerialNumber.generateSerialNumber;
+import static com.materials.api.utils.TokenUtils.getNextToken;
 
 import com.materials.api.controller.dto.ItemFilterDTO;
 import com.materials.api.controller.dto.ItemRequestDTO;
@@ -12,7 +13,6 @@ import com.materials.api.service.dto.ItemDTO;
 
 import com.materials.api.service.exceptions.GeneralException;
 import com.materials.api.service.exceptions.NotFoundException;
-import com.materials.api.utils.TokenHelper;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -44,17 +44,12 @@ public class ItemService {
 
   public PaginationDTO<ItemDTO> findByFilter(ItemFilterDTO filter) {
     var result = itemRepository.findByFilter(filter);
-
-    String nextToken = null;
-    if (result.size() == filter.getRows()) {
-      nextToken =
-          Optional.ofNullable(CollectionUtils.lastElement(result))
-              .map(
-                  dto ->
-                      TokenHelper.generateBase32Token(
-                          dto.getId(), filter.getOrderByColumn().getColumnValue(dto)))
-              .orElse(null);
-    }
+    var nextToken =
+        getNextToken(
+            result,
+            filter.getRows(),
+            ItemDTO::getId,
+            item -> filter.getOrderByColumn().getColumnValue(item));
 
     return new PaginationDTO<>(result, nextToken);
   }

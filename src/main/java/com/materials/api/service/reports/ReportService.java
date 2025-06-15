@@ -1,4 +1,4 @@
-package com.materials.api.service.report;
+package com.materials.api.service.reports;
 
 import java.util.Map;
 

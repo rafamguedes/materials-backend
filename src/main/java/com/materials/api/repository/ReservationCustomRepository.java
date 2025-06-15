@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReservationCustomRepository {
   List<ReservationDTO> findByFilter(ReservationFilterDTO filter);
-  List<Reservation> findCancelledReservations(ReservationReportFilterDTO filter);
+  List<Reservation> generateReservationReport(ReservationReportFilterDTO filter);
 }
