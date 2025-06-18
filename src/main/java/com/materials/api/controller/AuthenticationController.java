@@ -2,7 +2,10 @@ package com.materials.api.controller;
 
 import com.materials.api.controller.dto.AuthDTO;
 import com.materials.api.controller.dto.TokenDTO;
+import com.materials.api.entity.User;
+import com.materials.api.security.Role;
 import com.materials.api.service.TokenService;
+import com.materials.api.service.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +34,16 @@ public class AuthenticationController {
     try {
       var pass = new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword());
       var auth = authenticationManager.authenticate(pass);
+      var userDetails = (User) auth.getPrincipal();
       var token = tokenService.generateToken(auth.getName());
 
-      return ResponseEntity.ok(new TokenDTO(token));
+      var name = userDetails.getName();
+      var email = userDetails.getEmail();
+      var role = userDetails.getRole();
+
+      return ResponseEntity.ok(new TokenDTO(token, name, email, role));
     } catch (BadCredentialsException ex) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(new TokenDTO(INVALID_USERNAME_OR_PASSWORD));
+      throw new BadRequestException(INVALID_USERNAME_OR_PASSWORD);
     }
   }
 
