@@ -34,3 +34,6 @@ spring:
         show-details: always
       caches:
         enabled: true
+  security:
+    token:
+      secret: MySecretTokenKey
