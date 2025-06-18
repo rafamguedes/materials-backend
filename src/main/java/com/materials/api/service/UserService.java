@@ -5,6 +5,7 @@ import com.materials.api.controller.dto.UserRequestDTO;
 import com.materials.api.entity.User;
 import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.UserRepository;
+import com.materials.api.security.Role;
 import com.materials.api.service.dto.UserDTO;
 import com.materials.api.service.exceptions.BadRequestException;
 import com.materials.api.service.exceptions.ConflictException;
@@ -13,6 +14,10 @@ import com.materials.api.service.rest.PostalCodeRestService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,7 +27,7 @@ import static com.materials.api.utils.TokenUtils.getNextToken;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
   private final UserRepository userRepository;
   private final PostalCodeRestService postalCodeRestService;
   private final ModelMapper modelMapper;
@@ -31,6 +36,7 @@ public class UserService {
   private static final String EMAIL_ALREADY_EXISTS = "Email already exists, please use a different email";
   private static final String POSTAL_CODE_NOT_FOUND = "Postal code not found, please check the postal code: ";
   private static final String DELETE_ERROR_MESSAGE = "Error deleting user, please check if the user is associated with any reservations or items.";
+  private static final String USER_NOT_FOUND_WITH_EMAIL = "User not found with email: ";
 
   public UserDTO create(UserRequestDTO requestDTO) {
     if (userRepository.existsByEmail(requestDTO.getEmail())) {
@@ -41,6 +47,8 @@ public class UserService {
       return createWithAddress(requestDTO);
     } else {
       var user = modelMapper.map(requestDTO, User.class);
+      user.setPassword(getEncodePassword(requestDTO));
+      user.setRole(Role.USER);
       var savedUser = userRepository.save(user);
       return modelMapper.map(savedUser, UserDTO.class);
     }
@@ -54,6 +62,8 @@ public class UserService {
 
     var user = modelMapper.map(requestDTO, User.class);
     user.setAddress(address);
+    user.setPassword(getEncodePassword(requestDTO));
+    user.setRole(Role.USER);
     var savedUser = userRepository.save(user);
     return modelMapper.map(savedUser, UserDTO.class);
   }
@@ -124,5 +134,17 @@ public class UserService {
     } catch (DataIntegrityViolationException e) {
       throw new BadRequestException(DELETE_ERROR_MESSAGE);
     }
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    return userRepository
+        .findByEmail(email)
+        .orElseThrow(
+            () -> new UsernameNotFoundException(USER_NOT_FOUND_WITH_EMAIL + email));
+  }
+
+  private static String getEncodePassword(UserRequestDTO requestDTO) {
+    return new BCryptPasswordEncoder().encode(requestDTO.getPassword());
   }
 }
