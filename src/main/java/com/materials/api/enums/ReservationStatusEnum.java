@@ -6,6 +6,6 @@ import lombok.Getter;
 public enum ReservationStatusEnum {
   PENDING,
   IN_PROGRESS,
-  COMPLETED,
-  CANCELED;
+  CONFIRMED,
+  CANCELLED;
 }

@@ -2,6 +2,7 @@ package com.materials.api.service;
 
 import com.materials.api.controller.dto.UserFilterDTO;
 import com.materials.api.controller.dto.UserRequestDTO;
+import com.materials.api.controller.dto.UserUpdateRequestDTO;
 import com.materials.api.entity.User;
 import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.UserRepository;
@@ -91,7 +92,7 @@ public class UserService implements UserDetailsService {
         .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND + id));
   }
 
-  public UserDTO update(Long id, UserRequestDTO requestDTO) {
+  public UserDTO update(Long id, UserUpdateRequestDTO requestDTO) {
     var user = findEntityById(id);
     user.setName(requestDTO.getName());
     user.setEmail(requestDTO.getEmail());
