@@ -43,6 +43,7 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
                     + "WHERE 1=1 "
                     + appendSearchByFilter(filter)
                     + appendSearchByStatus(filter)
+                    + appendUserIdFilter(filter)
                     + appendTokenFilter(filter)
                     + "ORDER BY " + filter.getOrderByColumn()
                     + (FilterOrderEnum.DESC.equals(filter.getOrder())
@@ -56,6 +57,9 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
 
     Optional.ofNullable(filter.getStatus())
         .ifPresent(s -> nativeQuery.setParameter("status", s.name()));
+
+    Optional.ofNullable(filter.getUserId())
+        .ifPresent(userId -> nativeQuery.setParameter("userId", userId));
 
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
@@ -82,6 +86,10 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     return Objects.nonNull(filter.getStatus())
         ? " AND r.status LIKE CAST(:status AS VARCHAR) "
         : " ";
+  }
+
+  private String appendUserIdFilter(ReservationFilterDTO filter) {
+    return Objects.nonNull(filter.getUserId()) ? " AND u.id = :userId " : " ";
   }
 
   private String appendTokenFilter(ReservationFilterDTO filter) {

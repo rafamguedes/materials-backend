@@ -2,6 +2,7 @@ package com.materials.api.controller;
 
 import com.materials.api.controller.dto.UserFilterDTO;
 import com.materials.api.controller.dto.UserRequestDTO;
+import com.materials.api.controller.dto.UserUpdateRequestDTO;
 import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.service.UserService;
 import com.materials.api.service.dto.UserDTO;
@@ -44,7 +45,7 @@ public class UserController {
 
   @PutMapping("/{id}")
   public ResponseEntity<UserDTO> update(
-      @PathVariable Long id, @Valid @RequestBody UserRequestDTO requestDTO) {
+      @PathVariable Long id, @Valid @RequestBody UserUpdateRequestDTO requestDTO) {
     var response = userService.update(id, requestDTO);
     return ResponseEntity.ok(response);
   }

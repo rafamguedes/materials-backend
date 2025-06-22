@@ -175,7 +175,7 @@ public class ReservationService {
             .orElseThrow(
                 () -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
-    reservation.setStatus(ReservationStatusEnum.CANCELED);
+    reservation.setStatus(ReservationStatusEnum.CANCELLED);
     item.setStatus(ItemStatusEnum.AVAILABLE);
     reservationRepository.save(reservation);
   }
@@ -218,7 +218,7 @@ public class ReservationService {
             .orElseThrow(
                 () -> new NotFoundException(ITEM_NOT_FOUND + reservation.getItem().getId()));
 
-    reservation.setStatus(ReservationStatusEnum.COMPLETED);
+    reservation.setStatus(ReservationStatusEnum.CONFIRMED);
     reservation.setEndTime(LocalDateTime.now());
     reservation.setItem(null);
     item.setStatus(ItemStatusEnum.AVAILABLE);

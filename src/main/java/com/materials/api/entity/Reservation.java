@@ -13,6 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
@@ -53,15 +55,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tb_reservation")
-public class Reservation implements Serializable {
+public class Reservation extends GenericEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
   public static final String RESERVATION_DTO_MAPPING = "ReservationDTO";
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  private Long id;
 
   @Column(name = "date_time")
   private LocalDateTime dateTime;
@@ -100,4 +98,11 @@ public class Reservation implements Serializable {
 
   @Column(name = "deleted")
   private Boolean deleted;
+
+  @PrePersist
+    public void prePersist() {
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+    this.deleted = false;
+  }
 }

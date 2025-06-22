@@ -18,4 +18,5 @@ public class ReservationFilterDTO extends PaginationFilter {
   private String search;
   private OrderByColumnReservationEnum orderByColumn;
   private ReservationStatusEnum status;
+  private Long userId;
 }

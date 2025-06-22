@@ -7,18 +7,15 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class UserRequestDTO {
-  @NotEmpty(message = "O nome não pode estar vazio.")
+public class UserUpdateRequestDTO {
+  @NotEmpty
   private String name;
 
-  @NotEmpty(message = "O e-mail não pode estar vazio.")
-  @Email(message = "O e-mail deve ser válido.")
+  @NotEmpty
+  @Email
   private String email;
 
-  @NotEmpty(message = "A senha não pode estar vazia.")
-  @Size(min = 8, max = 20, message = "A senha deve ter entre 8 e 20 caracteres.")
-  private String password;
-
+  @NotEmpty
   private String registry;
 
   private Boolean active;
