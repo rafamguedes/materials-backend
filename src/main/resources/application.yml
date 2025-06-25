@@ -1,39 +1,35 @@
 spring:
   server:
-    port: ${SERVER_PORT:8080}
+    port: ${PORT:8080}
   application:
     name: ${APPLICATION_NAME:materials}
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    url: ${DATABASE_URL}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     properties:
       hibernate:
-        dialect: ${HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
-    show-sql: ${SHOW_SQL:true}
-    open-in-view: ${OPEN_IN_VIEW:false}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     enabled: ${LIQUIBASE_ENABLED:true}
-    change-log: ${LIQUIBASE_CHANGELOG:classpath:/db/changelog/db.changelog-master.yaml}
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
   cache:
     type: ${CACHE_TYPE:simple}
-    cache-names: ${CACHE_NAMES:reservations,reservationFilters}
-    simple:
-      cache-names: ${CACHE_NAMES:reservations,reservationFilters}
+    cache-names: reservations,reservationFilters
   management:
     endpoints:
       web:
         exposure:
-          include: ${MANAGEMENT_ENDPOINTS_INCLUDE:health,info,caches}
+          include: health,info,caches
     endpoint:
       health:
-        show-details: ${HEALTH_SHOW_DETAILS:always}
+        show-details: always
       caches:
-        enabled: ${CACHES_ENABLED:true}
+        enabled: true
   security:
     token:
-      secret: ${SECURITY_TOKEN_SECRET:MySecretTokenKey}
+      secret: ${SECURITY_TOKEN_SECRET}
