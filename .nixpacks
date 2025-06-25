@@ -1,0 +1,2 @@
+[phases.build]
+nixPkgs = ["jdk21", "maven"]
