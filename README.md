@@ -5,7 +5,7 @@ visando atender os professores e funcionários na locação de equipamentos como
 
 Tecnologias inicialmente utilizadas:
 
-- Java 21
+- Java 17
 - Spring
 - Spring Boot
 - PostgreSQL
