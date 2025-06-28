@@ -12,12 +12,28 @@ public class TokenService {
 
   private final Algorithm algorithm;
 
+  @Value("${spring.security.token.secret}")
+  private String secret;
+
+  @Value("${spring.security.token.expiration}")
+  private Long accessTokenExpiration;
+
+  @Value("${spring.security.refresh.token.expiration}")
+  private Long refreshTokenExpiration;
+
   public TokenService(@Value("${spring.security.token.secret}") String secret) {
     this.algorithm = Algorithm.HMAC256(secret);
   }
 
   public String generateToken(String email) {
     return JWT.create().withSubject(email).withExpiresAt(generateExpiration()).sign(algorithm);
+  }
+
+  public String generateRefreshToken(String email) {
+    return JWT.create()
+        .withSubject(email)
+        .withExpiresAt(Instant.now().plus(refreshTokenExpiration, ChronoUnit.DAYS))
+        .sign(algorithm);
   }
 
   private Instant generateExpiration() {
