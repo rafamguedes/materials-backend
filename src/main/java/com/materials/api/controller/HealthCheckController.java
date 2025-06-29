@@ -1,5 +1,11 @@
 package com.materials.api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -13,11 +19,16 @@ import javax.sql.DataSource;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/health")
+@Tag(name = "Health Check", description = "Endpoint to check the health of the application")
 public class HealthCheckController implements HealthIndicator {
 
   private final DataSource dataSource;
 
   @GetMapping
+  @Operation(description = "Checks the health of the application, including database connectivity and system status.")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Status OK, application is running smoothly"),
+    @ApiResponse(responseCode = "503", description = "Application is down or database is unavailable", content = @Content(schema = @Schema())) })
   public Health check() {
     try {
       boolean databaseUp = checkDatabaseConnection();
