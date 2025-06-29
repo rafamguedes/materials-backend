@@ -6,7 +6,9 @@ import static com.materials.api.utils.TokenUtils.getNextToken;
 import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.controller.dto.ReservationRequestDTO;
 import com.materials.api.controller.dto.ReservationUpdateRequestDTO;
+import com.materials.api.entity.Item;
 import com.materials.api.entity.Reservation;
+import com.materials.api.entity.User;
 import com.materials.api.enums.ItemStatusEnum;
 import com.materials.api.enums.ReservationStatusEnum;
 import com.materials.api.service.exceptions.BadRequestException;
@@ -16,6 +18,7 @@ import com.materials.api.repository.ReservationRepository;
 import com.materials.api.repository.UserRepository;
 import com.materials.api.service.dto.ReservationDTO;
 import com.materials.api.service.exceptions.NotFoundException;
+import com.materials.api.utils.EmailTemplateUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,9 @@ import java.util.Optional;
 public class ReservationService {
   private static final String RESERVATION_NOT_FOUND = "Reserva não encontrada";
   private static final String ITEM_NOT_FOUND = "Item não encontrado, verifique o ID do item: ";
-  private static final String USER_NOT_FOUND = "Usuário não encontrado, verifique o ID do usuário: ";
+  private static final String EMAIL_SUBJECT = "Confirmação de Reserva";
+  private static final String USER_NOT_FOUND =
+      "Usuário não encontrado, verifique o ID do usuário: ";
   private static final String RESERVATION_ALREADY_EXISTS =
       "Já existe uma reserva para o horário informado: ";
   private static final String RESERVATION_START_VALIDATE_STATUS =
@@ -42,6 +47,7 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final ItemRepository itemRepository;
   private final ModelMapper modelMapper;
+  private final SendGridEmailService emailService;
 
   public ReservationDTO create(ReservationRequestDTO requestDTO) {
     validateDateTime(requestDTO);
@@ -49,7 +55,8 @@ public class ReservationService {
     var user =
         userRepository
             .findByRegistry(requestDTO.getUserRegistry())
-            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND + requestDTO.getUserRegistry()));
+            .orElseThrow(
+                () -> new NotFoundException(USER_NOT_FOUND + requestDTO.getUserRegistry()));
 
     var item =
         itemRepository
@@ -66,7 +73,13 @@ public class ReservationService {
             .build();
 
     var savedReservation = reservationRepository.save(reservation);
+    sendEmailConfirmation(user, item, savedReservation);
     return modelMapper.map(savedReservation, ReservationDTO.class);
+  }
+
+  private void sendEmailConfirmation(User user, Item item, Reservation reservation) {
+    var emailContent = EmailTemplateUtils.getReservationConfirmationEmail(user, item, reservation);
+    emailService.sendEmail(user.getEmail(), EMAIL_SUBJECT, emailContent);
   }
 
   private void validateDateTime(ReservationRequestDTO requestDTO) {
@@ -74,8 +87,7 @@ public class ReservationService {
         .findByDateTime(requestDTO.getDateTime())
         .ifPresent(
             reservation -> {
-              throw new BadRequestException(
-                  RESERVATION_ALREADY_EXISTS + requestDTO.getDateTime());
+              throw new BadRequestException(RESERVATION_ALREADY_EXISTS + requestDTO.getDateTime());
             });
   }
 
@@ -166,7 +178,7 @@ public class ReservationService {
             .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_FOUND));
 
     if (!ReservationStatusEnum.PENDING.equals(reservation.getStatus())) {
-        throw new BadRequestException(RESERVATION_CANCEL_VALIDATE_STATUS);
+      throw new BadRequestException(RESERVATION_CANCEL_VALIDATE_STATUS);
     }
 
     var item =
@@ -209,7 +221,7 @@ public class ReservationService {
             .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_FOUND));
 
     if (!ReservationStatusEnum.IN_PROGRESS.equals(reservation.getStatus())) {
-        throw new BadRequestException(RESERVATION_COMPLETE_VALIDATE_STATUS);
+      throw new BadRequestException(RESERVATION_COMPLETE_VALIDATE_STATUS);
     }
 
     var item =
