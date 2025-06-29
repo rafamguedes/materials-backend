@@ -6,6 +6,12 @@ import com.materials.api.controller.dto.TokenDTO;
 import com.materials.api.entity.User;
 import com.materials.api.service.TokenService;
 import com.materials.api.service.exceptions.BadRequestException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,15 +26,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/authentication")
+@Tag(name = "Authentication", description = "Endpoints for user authentication and token management")
 public class AuthenticationController {
 
   private static final String INVALID_USERNAME_OR_PASSWORD = "Nome de usuário ou senha inválidos.";
   private static final String SUCCESSFULLY_LOGGED_OUT = "Logout realizado com sucesso.";
+  private static final String INVALID_REFRESH_TOKEN = "Refresh token inválido ou expirado";
 
   private final AuthenticationManager authenticationManager;
   private final TokenService tokenService;
 
   @PostMapping("/login")
+  @Operation(description = "Logs in a user and returns an access token and refresh token.")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Login successful, returns access and refresh tokens"),
+    @ApiResponse(responseCode = "400", description = "Invalid username or password",
+      content = @Content(schema = @Schema(type = "string", example = INVALID_USERNAME_OR_PASSWORD))) })
   public ResponseEntity<TokenDTO> login(@RequestBody AuthDTO req) {
     try {
       var pass = new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword());
@@ -50,6 +63,11 @@ public class AuthenticationController {
   }
 
   @PostMapping("/refresh")
+  @Operation(description = "Refreshes the access token using a valid refresh token.")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Refresh successful, returns new access and refresh tokens"),
+    @ApiResponse(responseCode = "400", description = "Invalid or expired refresh token",
+      content = @Content(schema = @Schema(type = "string", example = "Refresh token inválido ou expirado"))) })
   public ResponseEntity<TokenDTO> refresh(@RequestBody RefreshTokenDTO req) {
     try {
       var email = tokenService.validateToken(req.getRefreshToken());
@@ -63,11 +81,15 @@ public class AuthenticationController {
 
       return ResponseEntity.ok(new TokenDTO(newAccessToken, newRefreshToken, id, name, email, role));
     } catch (Exception e) {
-      throw new BadRequestException("Refresh token inválido ou expirado");
+      throw new BadRequestException(INVALID_REFRESH_TOKEN);
     }
   }
 
   @PostMapping("/logout")
+  @Operation(description = "Logs out the user by clearing the security context.")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Logout successful"),
+    @ApiResponse(responseCode = "400", description = "Logout failed", content = @Content(schema = @Schema())) })
   public ResponseEntity<String> logout() {
     SecurityContextHolder.clearContext();
     return ResponseEntity.ok().body(SUCCESSFULLY_LOGGED_OUT);
