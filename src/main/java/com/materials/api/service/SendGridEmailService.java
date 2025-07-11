@@ -7,14 +7,17 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SendGridEmailService {
+  private static final String SUCCESSFULLY_SENT_EMAIL = "Email sent successfully to: ";
   private static final String FAILED_TO_SEND_EMAIL = "Failed to send email: ";
   private static final String CONTENT_TYPE = "text/plain";
   private static final String MAIL_SEND = "mail/send";
@@ -38,8 +41,10 @@ public class SendGridEmailService {
       request.setMethod(Method.POST);
       request.setEndpoint(MAIL_SEND);
       request.setBody(mail.build());
-      sg.api(request);
+      var response = sg.api(request);
+      log.info(SUCCESSFULLY_SENT_EMAIL + "{}", response.getStatusCode());
     } catch (IOException e) {
+      log.error(FAILED_TO_SEND_EMAIL + "{}", e.getMessage(), e);
       throw new RuntimeException(FAILED_TO_SEND_EMAIL + e.getMessage(), e);
     }
   }
