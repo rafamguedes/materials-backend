@@ -10,12 +10,26 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class NotifierService {
-  private static final String NOTIFIER_EMAIL_SUBJECT = "Reservation Confirmation";
 
   private final EmailService emailService;
 
-  public void sendEmailToConfirmReservation(User user, Item item, Reservation reservation) {
+  public void sendConfirmationReservationNotification(User user, Item item, Reservation reservation) {
     var emailContent = EmailTemplateUtils.getReservationConfirmationEmail(user, item, reservation);
-    emailService.sendEmailWithSendGrid(user.getEmail(), NOTIFIER_EMAIL_SUBJECT, emailContent);
+    emailService.sendEmailWithSendGrid(user.getEmail(), "Reservation Confirmation", emailContent);
+  }
+
+  public void sendCancellationReservationNotification(User user, Item item, Reservation reservation) {
+    var emailContent = EmailTemplateUtils.getReservationCancellationEmail(user, item, reservation);
+    emailService.sendEmailWithSendGrid(user.getEmail(), "Reservation Cancellation", emailContent);
+  }
+
+  public void sendStartReservationNotification(User user, Item item, Reservation reservation) {
+    var emailContent = EmailTemplateUtils.getReservationConfirmationEmail(user, item, reservation);
+    emailService.sendEmailWithSendGrid(user.getEmail(), "Reservation Started", emailContent);
+  }
+
+  public void sendFinishReservationNotification(User user, Item item, Reservation reservation) {
+    var emailContent = EmailTemplateUtils.getReservationConfirmationEmail(user, item, reservation);
+    emailService.sendEmailWithSendGrid(user.getEmail(), "Reservation Finished", emailContent);
   }
 }

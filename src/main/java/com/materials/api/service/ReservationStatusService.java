@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 public class ReservationStatusService {
 
   private final ReservationRepository reservationRepository;
+  private final NotifierService notifierService;
   private final ItemRepository itemRepository;
 
   public void cancel(String code) {
@@ -40,6 +41,7 @@ public class ReservationStatusService {
 
     reservation.setStatus(ReservationStatusEnum.CANCELLED);
     item.setStatus(ItemStatusEnum.AVAILABLE);
+    notifierService.sendCancellationReservationNotification(reservation.getUser(), item, reservation);
     reservationRepository.save(reservation);
   }
 
@@ -62,6 +64,7 @@ public class ReservationStatusService {
     reservation.setStatus(ReservationStatusEnum.IN_PROGRESS);
     reservation.setStartTime(LocalDateTime.now());
     item.setStatus(ItemStatusEnum.RESERVED);
+    notifierService.sendStartReservationNotification(reservation.getUser(), item, reservation);
     reservationRepository.save(reservation);
   }
 
@@ -84,7 +87,7 @@ public class ReservationStatusService {
     reservation.setStatus(ReservationStatusEnum.CONFIRMED);
     reservation.setEndTime(LocalDateTime.now());
     item.setStatus(ItemStatusEnum.AVAILABLE);
-
+    notifierService.sendFinishReservationNotification(reservation.getUser(), item, reservation);
     reservationRepository.save(reservation);
   }
 }

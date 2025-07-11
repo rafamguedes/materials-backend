@@ -34,4 +34,74 @@ public class EmailTemplateUtils {
         reservation.getDateTime().format(DATE_TIME_FORMATTER),
         reservation.getStatus().name());
   }
+
+  public static String getReservationCancellationEmail(
+      User user, Item item, Reservation reservation) {
+    return String.format(
+        """
+                Olá %s,
+
+                Sua reserva foi cancelada.
+
+                Detalhes da reserva:
+                Código: %s
+                Item: %s
+                Data/Hora: %s
+                Status: %s
+
+                Atenciosamente,
+                Equipe de Reservas
+                """,
+        user.getName(),
+        reservation.getCode(),
+        item.getName(),
+        reservation.getDateTime().format(DATE_TIME_FORMATTER),
+        reservation.getStatus().name());
+  }
+
+  public static String getReservationStartedEmail(User user, Item item, Reservation reservation) {
+    return String.format(
+        """
+                    Olá %s,
+
+                    Sua reserva foi iniciada com sucesso!
+
+                    Detalhes da reserva:
+                    Código: %s
+                    Item: %s
+                    Data/Hora: %s
+                    Status: %s
+
+                    Atenciosamente,
+                    Equipe de Reservas
+                    """,
+        user.getName(),
+        reservation.getCode(),
+        item.getName(),
+        reservation.getDateTime().format(DATE_TIME_FORMATTER),
+        reservation.getStatus().name());
+  }
+
+  public static String getReservationFinishedEmail(User user, Item item, Reservation reservation) {
+    return String.format(
+        """
+                    Olá %s,
+
+                    Sua reserva foi finalizada com sucesso!
+
+                    Detalhes da reserva:
+                    Código: %s
+                    Item: %s
+                    Data/Hora: %s
+                    Status: %s
+
+                    Atenciosamente,
+                    Equipe de Reservas
+                    """,
+        user.getName(),
+        reservation.getCode(),
+        item.getName(),
+        reservation.getDateTime().format(DATE_TIME_FORMATTER),
+        reservation.getStatus().name());
+  }
 }
