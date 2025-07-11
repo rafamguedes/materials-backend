@@ -16,7 +16,7 @@ import java.io.IOException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SendGridEmailService {
+public class EmailService {
   private static final String SUCCESSFULLY_SENT_EMAIL = "Email sent successfully to: ";
   private static final String FAILED_TO_SEND_EMAIL = "Failed to send email: ";
   private static final String CONTENT_TYPE = "text/plain";
@@ -28,7 +28,7 @@ public class SendGridEmailService {
   @Value("${sendgrid.email.from}")
   private String fromEmail;
 
-  public void sendEmail(String to, String subject, String content) {
+  public void sendEmailWithSendGrid(String to, String subject, String content) {
     try {
       var from = new Email(fromEmail);
       var toEmail = new Email(to);

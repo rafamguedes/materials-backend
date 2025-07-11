@@ -47,7 +47,7 @@ public class ReservationService {
   private final UserRepository userRepository;
   private final ItemRepository itemRepository;
   private final ModelMapper modelMapper;
-  private final SendGridEmailService emailService;
+  private final EmailService emailService;
 
   public ReservationDTO create(ReservationRequestDTO requestDTO) {
     validateDateTime(requestDTO);
@@ -79,7 +79,7 @@ public class ReservationService {
 
   private void sendEmailConfirmation(User user, Item item, Reservation reservation) {
     var emailContent = EmailTemplateUtils.getReservationConfirmationEmail(user, item, reservation);
-    emailService.sendEmail(user.getEmail(), EMAIL_SUBJECT, emailContent);
+    emailService.sendEmailWithSendGrid(user.getEmail(), EMAIL_SUBJECT, emailContent);
   }
 
   private void validateDateTime(ReservationRequestDTO requestDTO) {
