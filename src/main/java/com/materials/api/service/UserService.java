@@ -1,5 +1,7 @@
 package com.materials.api.service;
 
+import static com.materials.api.service.exceptions.messages.UserMessages.*;
+
 import com.materials.api.controller.dto.UserFilterDTO;
 import com.materials.api.controller.dto.UserRequestDTO;
 import com.materials.api.controller.dto.UserUpdateRequestDTO;
@@ -12,7 +14,9 @@ import com.materials.api.service.exceptions.BadRequestException;
 import com.materials.api.service.exceptions.ConflictException;
 import com.materials.api.service.exceptions.NotFoundException;
 import com.materials.api.service.rest.PostalCodeRestService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,15 +37,9 @@ public class UserService implements UserDetailsService {
   private final PostalCodeRestService postalCodeRestService;
   private final ModelMapper modelMapper;
 
-  private static final String USER_NOT_FOUND = "User not found, please check the user ID: ";
-  private static final String EMAIL_ALREADY_EXISTS = "Email already exists, please use a different email";
-  private static final String POSTAL_CODE_NOT_FOUND = "Postal code not found, please check the postal code: ";
-  private static final String DELETE_ERROR_MESSAGE = "Error deleting user, please check if the user is associated with any reservations or items.";
-  private static final String USER_NOT_FOUND_WITH_EMAIL = "User not found with email: ";
-
   public UserDTO create(UserRequestDTO requestDTO) {
     if (userRepository.existsByEmail(requestDTO.getEmail())) {
-      throw new ConflictException(EMAIL_ALREADY_EXISTS);
+      throw new ConflictException(USER_EMAIL_ALREADY_EXISTS);
     }
 
     if (Objects.nonNull(requestDTO.getPostalCode())) {
@@ -58,7 +56,7 @@ public class UserService implements UserDetailsService {
   private UserDTO createWithAddress(UserRequestDTO requestDTO) {
     var address = postalCodeRestService.getAddressByPostalCode(requestDTO.getPostalCode());
     if (Objects.isNull(address.getCep())) {
-      throw new BadRequestException(POSTAL_CODE_NOT_FOUND + requestDTO.getPostalCode());
+      throw new BadRequestException(USER_POSTAL_CODE_NOT_FOUND + requestDTO.getPostalCode());
     }
 
     var user = modelMapper.map(requestDTO, User.class);
@@ -102,7 +100,7 @@ public class UserService implements UserDetailsService {
     if (Objects.nonNull(requestDTO.getPostalCode())) {
       var address = postalCodeRestService.getAddressByPostalCode(requestDTO.getPostalCode());
       if (Objects.isNull(address.getCep())) {
-        throw new BadRequestException(POSTAL_CODE_NOT_FOUND + requestDTO.getPostalCode());
+        throw new BadRequestException(USER_POSTAL_CODE_NOT_FOUND + requestDTO.getPostalCode());
       }
       user.setAddress(address);
     } else {
@@ -123,7 +121,7 @@ public class UserService implements UserDetailsService {
       user.setActive(Boolean.FALSE);
       userRepository.save(user);
     } catch (DataIntegrityViolationException e) {
-      throw new BadRequestException(DELETE_ERROR_MESSAGE);
+      throw new BadRequestException(USER_DELETE_ERROR_MESSAGE);
     }
   }
 
@@ -133,7 +131,7 @@ public class UserService implements UserDetailsService {
       userRepository.delete(user);
       userRepository.flush();
     } catch (DataIntegrityViolationException e) {
-      throw new BadRequestException(DELETE_ERROR_MESSAGE);
+      throw new BadRequestException(USER_DELETE_ERROR_MESSAGE);
     }
   }
 

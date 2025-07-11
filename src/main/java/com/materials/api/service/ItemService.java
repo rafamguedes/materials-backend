@@ -1,5 +1,6 @@
 package com.materials.api.service;
 
+import static com.materials.api.service.exceptions.messages.ItemMessages.*;
 import static com.materials.api.utils.GenerateSerialNumber.generateSerialNumber;
 import static com.materials.api.utils.TokenUtils.getNextToken;
 
@@ -17,14 +18,10 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
-import org.springframework.util.CollectionUtils;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-  private static final String ITEM_NOT_FOUND = "Item not found";
 
   private final ItemRepository itemRepository;
   private final ModelMapper modelMapper;
@@ -38,7 +35,7 @@ public class ItemService {
   }
 
   public ItemDTO getById(Long id) {
-    var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND));
+    var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + id));
     return modelMapper.map(item, ItemDTO.class);
   }
 
@@ -69,7 +66,7 @@ public class ItemService {
     try {
       itemRepository.delete(item);
     } catch (org.springframework.dao.DataIntegrityViolationException e) {
-      throw new GeneralException("Não é possível deletar um equipamento que esteja vinculado a uma reserva.");
+      throw new GeneralException(ITEM_DELETE_ERROR_MESSAGE);
     }
   }
 }

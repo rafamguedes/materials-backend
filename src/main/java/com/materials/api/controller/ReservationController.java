@@ -86,25 +86,4 @@ public class ReservationController {
     reservationService.recoverDelete(id);
     return ResponseEntity.noContent().build();
   }
-
-  @PatchMapping("/cancel/{code}")
-  @Operation(description = "Cancels a reservation by its code.")
-  public ResponseEntity<Void> cancel(@PathVariable String code) {
-    reservationService.cancel(code);
-    return ResponseEntity.ok().build();
-  }
-
-  @PatchMapping("/start/{code}")
-  @Operation(description = "Starts a reservation by its code.")
-  public ResponseEntity<Void> start(@PathVariable String code) {
-    reservationService.start(code);
-    return ResponseEntity.ok().build();
-  }
-
-  @PatchMapping("/complete/{code}")
-  @Operation(description = "Completes a reservation by its code.")
-  public ResponseEntity<Void> complete(@PathVariable String code) {
-    reservationService.complete(code);
-    return ResponseEntity.ok().build();
-  }
 }
