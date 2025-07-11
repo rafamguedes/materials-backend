@@ -9,9 +9,7 @@ import static com.materials.api.utils.TokenUtils.getNextToken;
 import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.controller.dto.ReservationRequestDTO;
 import com.materials.api.controller.dto.ReservationUpdateRequestDTO;
-import com.materials.api.entity.Item;
 import com.materials.api.entity.Reservation;
-import com.materials.api.entity.User;
 import com.materials.api.enums.ReservationStatusEnum;
 import com.materials.api.pagination.PaginationDTO;
 import com.materials.api.repository.ItemRepository;
@@ -63,7 +61,7 @@ public class ReservationService {
             .build();
 
     var savedReservation = reservationRepository.save(reservation);
-    notifierService.sendEmailToConfirmReservation(user, item, savedReservation);
+    notifierService.sendConfirmationReservationNotification(user, item, savedReservation);
     return modelMapper.map(savedReservation, ReservationDTO.class);
   }
 
