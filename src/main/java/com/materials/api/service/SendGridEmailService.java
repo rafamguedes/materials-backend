@@ -23,19 +23,19 @@ public class SendGridEmailService {
   private static final String MAIL_SEND = "mail/send";
 
   @Value("${sendgrid.api.key}")
-  private String API_KEY;
+  private String apiKey;
 
   @Value("${sendgrid.email.from}")
-  private String FROM_EMAIL;
+  private String fromEmail;
 
   public void sendEmail(String to, String subject, String content) {
     try {
-      var from = new Email(FROM_EMAIL);
+      var from = new Email(fromEmail);
       var toEmail = new Email(to);
       var emailContent = new Content(CONTENT_TYPE, content);
       var mail = new Mail(from, subject, toEmail, emailContent);
 
-      var sg = new SendGrid(API_KEY);
+      var sg = new SendGrid(apiKey);
       var request = new Request();
 
       request.setMethod(Method.POST);
