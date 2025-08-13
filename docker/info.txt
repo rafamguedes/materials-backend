@@ -1,0 +1,19 @@
+# Para rodar o Docker compose:
+
+cd docker
+
+docker compose up -d --build
+
+docker compose ps
+
+# Para parar o Docker compose:
+
+docker compose down
+
+# Para limpar os containers, imagens e volumes:
+
+docker compose down --rmi all --volumes --remove-orphans
+
+ou
+
+docker system prune --all

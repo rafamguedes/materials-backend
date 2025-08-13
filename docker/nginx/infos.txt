@@ -1,0 +1,15 @@
+# Escalonamento horizontal
+
+# Modifique o arquivo docker/nginx/nginx.conf para incluir mais servidores no bloco upstream, quando necessário.
+
+# Exemplo de configuração do bloco upstream do backend:
+
+upstream backend {
+    server backend:8080;
+    server backend2:8080;
+    server backend3:8080;
+}
+
+# Comando Docker para iniciar o Docker Compose com o backend escalado para 3 instâncias
+
+docker-compose -f docker/docker-compose.yml up -d --scale backend=3
