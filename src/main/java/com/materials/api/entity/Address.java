@@ -1,15 +1,12 @@
 package com.materials.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -19,11 +16,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "tb_address")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Address {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
+@EqualsAndHashCode(callSuper = true)
+public class Address extends GenericEntity {
   private String logradouro;
   private String numero;
   private String bairro;
