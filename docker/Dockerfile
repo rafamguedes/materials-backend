@@ -10,5 +10,4 @@ COPY src ./src
 
 EXPOSE 8080
 
-# Execute em modo de desenvolvimento ao invés de gerar JAR
 CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'"]
