@@ -34,15 +34,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tb_item")
-public class Item implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class Item extends GenericEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
   public static final String ITEM_DTO_MAPPING = "ItemDTOMapping";
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
 
   @Column(name = "name")
   private String name;
