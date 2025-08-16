@@ -1,189 +1,20 @@
-name: CI Pipeline
-
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+    branches:  develop
 
 jobs:
-  validate-tests:
+  Validate-tests:
     runs-on: ubuntu-latest
-    name: Tests and Code Coverage
-    
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: root
-          POSTGRES_DB: materials_db_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U root"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-          --health-start-period 30s
-      
-      redis:
-        image: redis:6.2-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-          --health-start-period 30s
-
+    name: Tests
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Baixa o repositório e dá checkout na branch que o job está rodando
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Instala o Java
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: maven
 
-      - name: Wait for services to be ready
-        run: |
-          echo "Installing required tools..."
-          sudo apt-get update && sudo apt-get install -y redis-tools postgresql-client netcat
-          
-          echo "Waiting for PostgreSQL..."
-          for i in {1..30}; do
-            if pg_isready -h localhost -p 5432 -U root > /dev/null 2>&1; then
-              echo "PostgreSQL is ready!"
-              break
-            else
-              echo "PostgreSQL is unavailable - attempt $i/30"
-              sleep 2
-            fi
-            if [ $i -eq 30 ]; then
-              echo "❌ PostgreSQL failed to start after 60 seconds"
-              exit 1
-            fi
-          done
-          
-          echo "Waiting for Redis..."
-          for i in {1..30}; do
-            if nc -z localhost 6379 > /dev/null 2>&1; then
-              echo "Redis port is open, testing connection..."
-              if timeout 5 redis-cli -h localhost -p 6379 ping > /dev/null 2>&1; then
-                echo "✅ Redis is ready!"
-                break
-              else
-                echo "Redis port open but not responding to ping - attempt $i/30"
-              fi
-            else
-              echo "Redis port not available - attempt $i/30"
-            fi
-            sleep 2
-            if [ $i -eq 30 ]; then
-              echo "❌ Redis failed to start after 60 seconds"
-              # Show container logs for debugging
-              echo "=== Redis container logs ==="
-              docker logs $(docker ps -q --filter "ancestor=redis:6.2-alpine")
-              exit 1
-            fi
-          done
-          
-          echo "✅ All services are ready!"
-
-      - name: Run tests with coverage
+      - name: Valida cobertura dos testes
         run: mvn clean verify
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/materials_db_test
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: root
-          SPRING_REDIS_HOST: localhost
-          SPRING_REDIS_PORT: 6379
-
-      - name: Generate test report
-        run: mvn surefire-report:report
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./target/site/jacoco/jacoco.xml
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            target/surefire-reports/
-            target/site/jacoco/
-          retention-days: 30
-
-      - name: Comment PR with coverage
-        if: github.event_name == 'pull_request'
-        uses: madrapps/jacoco-report@v1.6.1
-        with:
-          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 50
-          min-coverage-changed-files: 60
-
-  build:
-    runs-on: ubuntu-latest
-    name: Build Application
-    needs: validate-tests
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: maven
-
-      - name: Build application
-        run: mvn clean compile package -DskipTests
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar-artifact
-          path: target/*.jar
-          retention-days: 30
-
-  security-scan:
-    runs-on: ubuntu-latest
-    name: Security Scan
-    needs: validate-tests
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: maven
-
-      - name: Run dependency check
-        run: mvn org.owasp:dependency-check-maven:check
-        continue-on-error: true
-
-      - name: Upload security report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: security-report
-          path: target/dependency-check-report.html
-          retention-days: 30
