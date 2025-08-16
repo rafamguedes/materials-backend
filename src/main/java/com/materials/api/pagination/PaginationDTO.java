@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaginationDTO<T extends Serializable> {
+public class PaginationDTO<T extends Serializable> implements Serializable {
   private List<T> data;
   private String nextToken;
 }
