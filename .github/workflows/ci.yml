@@ -7,14 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Tests
     steps:
-      - name: Checkout code
+      - name: Baixa o repositório e dá checkout na branch que o job está rodando
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Instala o Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Validate tests
+      - name: Valida cobertura dos testes
         run: mvn clean verify
