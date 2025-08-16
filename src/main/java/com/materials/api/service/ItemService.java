@@ -16,9 +16,15 @@ import com.materials.api.service.exceptions.GeneralException;
 import com.materials.api.service.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -26,6 +32,7 @@ public class ItemService {
   private final ItemRepository itemRepository;
   private final ModelMapper modelMapper;
 
+  @CacheEvict(value = "items-filter", allEntries = true)
   public ItemDTO create(ItemRequestDTO requestDTO) {
     var item = modelMapper.map(requestDTO, Item.class);
     item.setStatus(ItemStatusEnum.AVAILABLE);
@@ -34,12 +41,20 @@ public class ItemService {
     return modelMapper.map(itemRepository.save(item), ItemDTO.class);
   }
 
+  @Cacheable(
+      cacheNames  = "items",
+      key = "#id")
   public ItemDTO getById(Long id) {
+    log.info("Fetching item with id: {}", id);
     var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND + id));
     return modelMapper.map(item, ItemDTO.class);
   }
 
+  @Cacheable(
+      cacheNames  = "items-filter",
+      key = "#filter.getCacheKey()")
   public PaginationDTO<ItemDTO> findByFilter(ItemFilterDTO filter) {
+    log.info("Finding items with filter: {}", filter);
     var result = itemRepository.findByFilter(filter);
     var nextToken =
         getNextToken(
@@ -51,6 +66,9 @@ public class ItemService {
     return new PaginationDTO<>(result, nextToken);
   }
 
+  @Caching(
+      put = {@CachePut(cacheNames = "items", key = "#id")},
+      evict = {@CacheEvict(cacheNames = "items-filter", allEntries = true)})
   public ItemDTO update(Long id, ItemRequestDTO requestDTO) {
     var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND));
     item.setName(requestDTO.getName());
@@ -61,6 +79,11 @@ public class ItemService {
     return modelMapper.map(itemRepository.save(item), ItemDTO.class);
   }
 
+  @Caching(
+      evict = {
+        @CacheEvict(cacheNames = "items", key = "#id"),
+        @CacheEvict(cacheNames = "items-filter", allEntries = true)
+      })
   public void delete(Long id) {
     var item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException(ITEM_NOT_FOUND));
     try {

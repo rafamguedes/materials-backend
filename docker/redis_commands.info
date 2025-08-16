@@ -1,0 +1,29 @@
+# Método 1: Autenticar após conectar
+docker exec -it redis_cache redis-cli
+AUTH redispass
+
+# Método 2: Conectar com a senha diretamente
+docker exec -it redis_cache redis-cli -a redispass
+
+# Comandos básicos de verificação
+PING                   # Verifica se o Redis está funcionando corretamente (responde PONG)
+INFO                   # Exibe informações sobre o servidor Redis
+MONITOR                # Monitora comandos em tempo real
+
+# Comandos para verificar chaves (keys)
+KEYS *                 # Lista TODAS as chaves (não use em produção)
+KEYS items*            # Lista chaves que começam com "items"
+DBSIZE                 # Retorna o número total de chaves
+
+# Comandos para examinar chaves específicas
+EXISTS items::1        # Verifica se a chave existe (1=sim, 0=não)
+TYPE items-filter      # Retorna o tipo da chave
+TTL items-filter       # Tempo de vida restante em segundos (-1=sem expiração)
+
+# Comandos para verificar valores
+GET items::1           # Obtém valor de uma chave string
+HGETALL items::1       # Obtém campos/valores de um hash
+
+# Comandos para manipulação de chaves
+DEL items::1           # Remove uma chave específica
+FLUSHDB                # Remove TODAS as chaves (cuidado!)
