@@ -47,11 +47,9 @@ public class AuthControllerTest {
   public void setUp() {
     var authority = new SimpleGrantedAuthority(ROLE);
 
-    // Usar a classe User da aplicação
     var user = new User();
     user.setEmail(EMAIL);
     user.setPassword(PASSWORD);
-    // Adicione outras propriedades necessárias para User
 
     var authentication =
         new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(authority));
@@ -89,7 +87,6 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(authDto)));
 
-    // Ajustar para o status real retornado pela aplicação
     result.andExpect(MockMvcResultMatchers.status().isBadRequest());
   }
 }
