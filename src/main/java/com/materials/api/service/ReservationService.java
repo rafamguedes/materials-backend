@@ -4,7 +4,7 @@ import static com.materials.api.service.exceptions.messages.ItemMessages.ITEM_NO
 import static com.materials.api.service.exceptions.messages.UserMessages.USER_NOT_FOUND;
 import static com.materials.api.service.exceptions.messages.ReservationMessages.*;
 import static com.materials.api.utils.GenerateCode.generateCode;
-import static com.materials.api.utils.TokenUtils.getNextToken;
+import static com.materials.api.pagination.TokenGenerator.generateNextPageToken;
 
 import com.materials.api.controller.dto.ReservationFilterDTO;
 import com.materials.api.controller.dto.ReservationRequestDTO;
@@ -136,7 +136,7 @@ public class ReservationService {
   public PaginationDTO<ReservationDTO> getByFilter(ReservationFilterDTO filter) {
     var result = reservationRepository.findByFilter(filter);
     var nextToken =
-        getNextToken(
+        generateNextPageToken(
             result,
             filter.getRows(),
             ReservationDTO::getId,

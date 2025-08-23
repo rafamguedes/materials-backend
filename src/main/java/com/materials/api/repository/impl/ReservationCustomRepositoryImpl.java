@@ -5,7 +5,7 @@ import com.materials.api.controller.dto.ReservationReportFilterDTO;
 import com.materials.api.entity.Reservation;
 import com.materials.api.enums.FilterOrderEnum;
 import com.materials.api.enums.ReservationStatusEnum;
-import com.materials.api.utils.TokenUtils;
+import com.materials.api.pagination.TokenExtractor;
 import com.materials.api.repository.ReservationCustomRepository;
 import com.materials.api.service.dto.ReservationDTO;
 import jakarta.persistence.EntityManager;
@@ -64,8 +64,8 @@ public class ReservationCustomRepositoryImpl implements ReservationCustomReposit
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
             t -> {
-              nativeQuery.setParameter("tokenName", TokenUtils.getTokenName(t));
-              nativeQuery.setParameter("tokenId", TokenUtils.getTokenId(t));
+              nativeQuery.setParameter("tokenName", TokenExtractor.extractSecondaryKeyAsString(t));
+              nativeQuery.setParameter("tokenId", TokenExtractor.extractPrimaryKeyAsLong(t));
             });
 
     return nativeQuery.getResultList();

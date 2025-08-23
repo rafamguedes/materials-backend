@@ -2,7 +2,7 @@ package com.materials.api.service;
 
 import static com.materials.api.service.exceptions.messages.ItemMessages.*;
 import static com.materials.api.utils.GenerateSerialNumber.generateSerialNumber;
-import static com.materials.api.utils.TokenUtils.getNextToken;
+import static com.materials.api.pagination.TokenGenerator.generateNextPageToken;
 
 import com.materials.api.controller.dto.ItemFilterDTO;
 import com.materials.api.controller.dto.ItemRequestDTO;
@@ -51,13 +51,13 @@ public class ItemService {
   }
 
   @Cacheable(
-      cacheNames  = "items-filter",
-      key = "#filter.getCacheKey()")
+      cacheNames = "items-filter",
+      key = "'rows:' + #filter.rows + '|order:' + #filter.order + '|orderByColumn:' + #filter.orderByColumn + '|status:' + #filter.status")
   public PaginationDTO<ItemDTO> findByFilter(ItemFilterDTO filter) {
     log.info("Finding items with filter: {}", filter);
     var result = itemRepository.findByFilter(filter);
     var nextToken =
-        getNextToken(
+        generateNextPageToken(
             result,
             filter.getRows(),
             ItemDTO::getId,
