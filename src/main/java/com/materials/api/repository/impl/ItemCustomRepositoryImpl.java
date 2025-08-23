@@ -6,9 +6,9 @@ import com.materials.api.entity.Item;
 import com.materials.api.enums.FilterOrderEnum;
 import com.materials.api.enums.ItemStatusEnum;
 import com.materials.api.enums.OrderByColumnItemEnum;
+import com.materials.api.pagination.TokenExtractor;
 import com.materials.api.repository.ItemCustomRepository;
 import com.materials.api.service.dto.ItemDTO;
-import com.materials.api.utils.TokenUtils;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Objects;
@@ -59,8 +59,8 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
             t -> {
-              nativeQuery.setParameter("tokenName", TokenUtils.getTokenName(t));
-              nativeQuery.setParameter("tokenId", TokenUtils.getTokenId(t));
+              nativeQuery.setParameter("tokenName", TokenExtractor.extractSecondaryKeyAsString(t));
+              nativeQuery.setParameter("tokenId", TokenExtractor.extractPrimaryKeyAsLong(t));
             });
 
     return nativeQuery.getResultList();

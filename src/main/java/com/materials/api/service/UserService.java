@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static com.materials.api.utils.TokenUtils.getNextToken;
+import static com.materials.api.pagination.TokenGenerator.generateNextPageToken;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService {
   public PaginationDTO<UserDTO> findByFilter(UserFilterDTO filter) {
     var result = userRepository.findByFilter(filter);
     var nextToken =
-        getNextToken(
+        generateNextPageToken(
             result,
             filter.getRows(),
             UserDTO::getId,

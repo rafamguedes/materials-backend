@@ -5,9 +5,9 @@ import com.materials.api.controller.dto.UserReportFilterDTO;
 import com.materials.api.entity.User;
 import com.materials.api.enums.FilterOrderEnum;
 import com.materials.api.enums.OrderByColumnUserEnum;
+import com.materials.api.pagination.TokenExtractor;
 import com.materials.api.repository.UserCustomRepository;
 import com.materials.api.service.dto.UserDTO;
-import com.materials.api.utils.TokenUtils;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Objects;
@@ -57,8 +57,8 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
     Optional.ofNullable(filter.getNextToken())
         .ifPresent(
             t -> {
-              nativeQuery.setParameter("tokenName", TokenUtils.getTokenName(t));
-              nativeQuery.setParameter("tokenId", TokenUtils.getTokenId(t));
+              nativeQuery.setParameter("tokenName", TokenExtractor.extractSecondaryKeyAsString(t));
+              nativeQuery.setParameter("tokenId", TokenExtractor.extractPrimaryKeyAsLong(t));
             });
 
     return nativeQuery.getResultList();

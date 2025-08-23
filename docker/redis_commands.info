@@ -1,9 +1,9 @@
 # Método 1: Autenticar após conectar
-docker exec -it redis_cache redis-cli
+docker exec -it redis redis-cli
 AUTH redispass
 
 # Método 2: Conectar com a senha diretamente
-docker exec -it redis_cache redis-cli -a redispass
+docker exec -it redis redis-cli -a redispass
 
 # Comandos básicos de verificação
 PING                   # Verifica se o Redis está funcionando corretamente (responde PONG)
